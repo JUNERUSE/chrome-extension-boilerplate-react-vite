@@ -21,10 +21,15 @@
   },
   "dependencies": {
     "@extension/i18n": "workspace:*",
+    "@extension/router": "workspace:*",
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
     "@extension/ui": "workspace:*",
-    "@extension/router": "workspace:*"
+    "@heroui/button": "^2.2.13",
+    "@heroui/system": "^2.4.10",
+    "@heroui/theme": "^2.4.9",
+    "@tabler/icons-react": "^3.30.0",
+    "framer-motion": "^12.4.7"
   },
   "devDependencies": {
     "@extension/tailwindcss-config": "workspace:*",

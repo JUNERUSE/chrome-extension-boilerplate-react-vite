@@ -1,5 +1,6 @@
 import { useStorage } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
+import { cn } from '@extension/ui';
 import type { ReactNode } from 'react';
 
 import { Nav } from '../shared/components/Nav';
@@ -14,11 +15,11 @@ const BaseLayout = ({ children }: Props) => {
   const isLight = theme === 'light';
 
   return (
-    <div className={`App min-h-screen py-16 ${isLight ? 'bg-white' : 'bg-black'}`}>
+    <main className={cn('min-h-screen py-16', isLight ? 'light bg-zinc-50' : 'dark bg-zinc-900')}>
       <SwitchTheme />
-      <div className={`${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>{children}</div>
+      {children}
       <Nav />
-    </div>
+    </main>
   );
 };
 
