@@ -21,9 +21,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-chrome.action.onClicked.addListener(async tab => {
-  await chrome.sidePanel.open({ windowId: tab.windowId });
-});
+// chrome.action.onClicked.addListener(async tab => {
+//   await chrome.sidePanel.open({ windowId: tab.windowId });
+// });
 
 console.log('Background loaded');
 console.log("Edit 'chrome-extension/src/background/index.ts' and save to reload.");
