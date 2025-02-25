@@ -1,6 +1,6 @@
+import { Link } from '@extension/router';
 import { useStorage } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
-import { Link } from '@tanstack/react-router';
 
 export function Home() {
   const theme = useStorage(exampleThemeStorage);

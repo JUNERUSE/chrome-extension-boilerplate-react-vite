@@ -24,7 +24,7 @@
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
     "@extension/ui": "workspace:*",
-    "@tanstack/react-router": "^1.111.7"
+    "@extension/router": "workspace:*"
   },
   "devDependencies": {
     "@extension/tailwindcss-config": "workspace:*",

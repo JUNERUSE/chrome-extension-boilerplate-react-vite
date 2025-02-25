@@ -244,6 +244,16 @@ importers:
         specifier: ^4.19.2
         version: 4.19.2
 
+  packages/router:
+    dependencies:
+      '@tanstack/react-router':
+        specifier: ^1.111.7
+        version: 1.111.7(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+    devDependencies:
+      '@extension/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+
   packages/shared:
     devDependencies:
       '@extension/storage':
@@ -493,6 +503,9 @@ importers:
       '@extension/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@extension/router':
+        specifier: workspace:*
+        version: link:../../packages/router
       '@extension/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -502,9 +515,6 @@ importers:
       '@extension/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      '@tanstack/react-router':
-        specifier: ^1.111.7
-        version: 1.111.7(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
     devDependencies:
       '@extension/tailwindcss-config':
         specifier: workspace:*

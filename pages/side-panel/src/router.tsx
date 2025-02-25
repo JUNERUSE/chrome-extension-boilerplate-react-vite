@@ -1,4 +1,5 @@
-import { createRootRoute, createRoute, createRouter, createHashHistory } from '@tanstack/react-router';
+import { createHashHistory, createRootRoute, createRoute, createRouter } from '@extension/router';
+
 import SidePanel from './SidePanel';
 import { Home } from './features/home/Home';
 import { Settings } from './features/settings/Settings';

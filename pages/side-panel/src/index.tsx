@@ -1,8 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { RouterProvider } from '@tanstack/react-router';
 import { router } from './router';
 import '@src/index.css';
+import { RouterProvider } from '@extension/router';
 
 function init() {
   const appContainer = document.querySelector('#app-container');

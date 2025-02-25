@@ -1,4 +1,4 @@
-import { Outlet } from '@tanstack/react-router';
+import { Outlet } from '@extension/router';
 import './SidePanel.css';
 import BaseLayout from './features/shared/layouts/BaseLayout';
 import { withErrorBoundary, withSuspense } from '@extension/shared';

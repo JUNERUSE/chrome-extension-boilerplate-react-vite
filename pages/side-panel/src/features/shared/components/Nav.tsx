@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link } from '@extension/router';
 import { useStorage } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
 import { cn } from '@extension/ui';
