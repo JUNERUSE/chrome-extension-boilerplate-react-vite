@@ -3,8 +3,10 @@ import { useStorage } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
 import { cn, ToggleButton } from '@extension/ui';
 import { IconMoon, IconSun } from '@tabler/icons-react';
+import type { FC } from 'react';
+import { memo } from 'react';
 
-export function SwitchTheme() {
+const SwitchTheme: FC = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
 
@@ -19,4 +21,6 @@ export function SwitchTheme() {
       </ToggleButton>
     </div>
   );
-}
+};
+
+export default memo(SwitchTheme);

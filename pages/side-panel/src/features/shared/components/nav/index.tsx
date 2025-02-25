@@ -1,6 +1,8 @@
 import { Link } from '@extension/router';
 import { cn } from '@extension/ui';
 import { IconMusic, IconTypography, IconVideo } from '@tabler/icons-react';
+import type { FC } from 'react';
+import { memo } from 'react';
 
 interface NavItemProps {
   to: string;
@@ -26,7 +28,7 @@ const NavItem = ({ to, icon, label }: NavItemProps) => {
   );
 };
 
-export function Nav() {
+const Nav: FC = () => {
   return (
     <nav
       className={cn(
@@ -41,4 +43,6 @@ export function Nav() {
       </div>
     </nav>
   );
-}
+};
+
+export default memo(Nav);

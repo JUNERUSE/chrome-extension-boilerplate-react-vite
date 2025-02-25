@@ -1,8 +1,8 @@
 import { createHashHistory, createRootRoute, createRoute, createRouter } from '@extension/router';
 import { SidePanel } from '@src/features/side-panel';
-import { Audio } from '@src/views/audio/Audio';
-import { Home } from '@src/views/home/Home';
-import { Video } from '@src/views/video/Video';
+import Audio from '@src/router/audio';
+import Home from '@src/router/home';
+import Video from '@src/router/video';
 
 // 创建根路由
 const rootRoute = createRootRoute({

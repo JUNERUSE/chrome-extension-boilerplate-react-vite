@@ -1,16 +1,12 @@
 import { useStorage } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
 import { cn } from '@extension/ui';
-import type { ReactNode } from 'react';
+import type { FC, PropsWithChildren } from 'react';
 
-import { Nav } from '../shared/components/Nav';
-import { SwitchTheme } from '../shared/components/SwitchTheme';
+import Nav from '../../features/shared/components/nav';
+import SwitchTheme from '../../features/shared/components/switch-theme';
 
-type Props = {
-  children: ReactNode;
-} & Record<string, unknown>;
-
-const BaseLayout = ({ children }: Props) => {
+const BaseLayout: FC<PropsWithChildren> = ({ children }) => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
 
