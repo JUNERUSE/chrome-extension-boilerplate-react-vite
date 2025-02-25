@@ -1,0 +1,24 @@
+import { useRouterState } from '@extension/router';
+import type { FC } from 'react';
+import { memo } from 'react';
+
+import SwitchTheme from '../switch-theme';
+
+const Header: FC = () => {
+  const router = useRouterState();
+
+  const stateMap: Record<string, string> = {
+    '/': '文字转语音',
+    '/audio': '音频传译',
+    '/video': '视频传译',
+  };
+
+  return (
+    <div className="flex items-center justify-between py-4 px-6">
+      <h2 className="text-lg font-bold">{stateMap[router.location.pathname]}</h2>
+      <SwitchTheme />
+    </div>
+  );
+};
+
+export default memo(Header);
