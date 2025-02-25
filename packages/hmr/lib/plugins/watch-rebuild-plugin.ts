@@ -1,9 +1,11 @@
 import fs from 'node:fs';
 import { resolve } from 'node:path';
+
 import type { PluginOption } from 'vite';
 import { WebSocket } from 'ws';
-import MessageInterpreter from '../interpreter/index.js';
+
 import { BUILD_COMPLETE, LOCAL_RELOAD_SOCKET_URL } from '../consts.js';
+import MessageInterpreter from '../interpreter/index.js';
 import type { PluginConfig } from '../types.js';
 
 const injectionsPath = resolve(import.meta.dirname, '..', 'injections');

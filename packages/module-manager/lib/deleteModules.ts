@@ -1,9 +1,10 @@
-import { checkbox } from '@inquirer/prompts';
 import fs, { createReadStream, createWriteStream } from 'node:fs';
-import { rimraf } from 'rimraf';
 import { posix, resolve } from 'node:path';
-import { AsyncZipDeflate, Zip } from 'fflate';
+
+import { checkbox } from '@inquirer/prompts';
 import fg from 'fast-glob';
+import { AsyncZipDeflate, Zip } from 'fflate';
+import { rimraf } from 'rimraf';
 
 const pagesPath = resolve(import.meta.dirname, '..', '..', '..', 'pages');
 const archivePath = resolve(import.meta.dirname, '..', 'archive');

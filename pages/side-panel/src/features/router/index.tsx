@@ -1,7 +1,7 @@
 import { createHashHistory, createRootRoute, createRoute, createRouter } from '@extension/router';
+import { SidePanel } from '@src/features/side-panel';
 import { Home } from '@src/views/home/Home';
 import { Settings } from '@src/views/settings/Settings';
-import { SidePanel } from '@src/features/side-panel';
 
 const rootRoute = createRootRoute({
   component: SidePanel,

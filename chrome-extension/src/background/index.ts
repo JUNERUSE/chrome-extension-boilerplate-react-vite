@@ -1,6 +1,7 @@
 import 'webextension-polyfill';
-import { exampleThemeStorage } from '@extension/storage';
+
 import { OPEN_SIDE_PANEL_CONTEXT_MENU_ID } from '@extension/shared';
+import { exampleThemeStorage } from '@extension/storage';
 
 exampleThemeStorage.get().then(theme => {
   console.log('theme', theme);

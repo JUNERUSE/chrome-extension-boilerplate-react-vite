@@ -1,8 +1,9 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
 import '@src/index.css';
+
 import { RouterProvider } from '@extension/router';
 import { router } from '@src/features/router';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 
 function init() {
   const appContainer = document.querySelector('#app-container');

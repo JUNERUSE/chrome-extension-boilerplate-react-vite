@@ -1,7 +1,8 @@
-import path from 'node:path';
 import fs from 'node:fs';
-import { unzipSync } from 'fflate';
+import path from 'node:path';
+
 import { checkbox } from '@inquirer/prompts';
+import { unzipSync } from 'fflate';
 
 const pagesPath = path.resolve(import.meta.dirname, '..', '..', '..', 'pages');
 const archivePath = path.resolve(import.meta.dirname, '..', 'archive');

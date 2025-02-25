@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { PluginOption } from 'vite';
+
 import { IS_FIREFOX } from '@extension/env';
+import type { PluginOption } from 'vite';
 
 /**
  * make entry point file for content script cache busting

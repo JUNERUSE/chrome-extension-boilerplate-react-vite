@@ -1,11 +1,11 @@
 import {
+  createHashHistory,
   createRootRoute,
   createRoute,
   createRouter,
-  createHashHistory,
-  RouterProvider,
-  Outlet,
   Link,
+  Outlet,
+  RouterProvider,
 } from '@tanstack/react-router';
 
-export { createRootRoute, createRoute, createRouter, createHashHistory, RouterProvider, Outlet, Link };
+export { createHashHistory, createRootRoute, createRoute, createRouter, Link, Outlet, RouterProvider };

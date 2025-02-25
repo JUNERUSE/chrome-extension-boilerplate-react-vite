@@ -1,6 +1,8 @@
 import { resolve } from 'node:path';
-import { zipBundle } from './lib/index.js';
+
 import { IS_FIREFOX } from '@extension/env';
+
+import { zipBundle } from './lib/index.js';
 
 const YYYY_MM_DD = new Date().toISOString().slice(0, 10).replace(/-/g, '');
 const HH_mm_ss = new Date().toISOString().slice(11, 19).replace(/:/g, '');

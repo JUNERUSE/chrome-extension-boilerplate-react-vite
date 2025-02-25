@@ -1,7 +1,8 @@
 import '@src/Popup.css';
+
+import { t } from '@extension/i18n';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
-import { t } from '@extension/i18n';
 import { ToggleButton } from '@extension/ui';
 
 const notificationOptions = {

@@ -1,11 +1,12 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
 import { platform } from 'node:process';
+import { pathToFileURL } from 'node:url';
+
 import type { Manifest } from '@extension/dev-utils';
 import { colorLog, ManifestParser } from '@extension/dev-utils';
-import type { PluginOption } from 'vite';
 import { IS_DEV, IS_FIREFOX } from '@extension/env';
+import type { PluginOption } from 'vite';
 
 const manifestFile = resolve(import.meta.dirname, '..', '..', 'manifest.js');
 const refreshFilePath = resolve(

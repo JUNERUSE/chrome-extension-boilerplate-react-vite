@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react';
 import { useStorage } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
-import { SwitchTheme } from '../shared/components/SwitchTheme';
+import type { ReactNode } from 'react';
+
 import { Nav } from '../shared/components/Nav';
+import { SwitchTheme } from '../shared/components/SwitchTheme';
 
 type Props = {
   children: ReactNode;

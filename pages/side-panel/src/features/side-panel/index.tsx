@@ -1,5 +1,6 @@
 import { Outlet } from '@extension/router';
 import { withErrorBoundary, withSuspense } from '@extension/shared';
+
 import BaseLayout from '../layout/BaseLayout';
 
 const SidePanelBase = () => {
