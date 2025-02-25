@@ -10,7 +10,11 @@ const BaseLayout: FC<PropsWithChildren> = ({ children }) => {
   const isLight = theme === 'light';
 
   return (
-    <main className={cn('min-h-screen', isLight ? 'light bg-zinc-50' : 'dark bg-zinc-900')}>
+    <main
+      className={cn(
+        'min-h-screen text-foreground bg-background text-sm',
+        isLight ? 'light bg-zinc-50' : 'dark bg-zinc-900',
+      )}>
       <AppHeader />
       {children}
       <AppNav />

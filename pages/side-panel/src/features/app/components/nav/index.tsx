@@ -1,34 +1,13 @@
-import { Link } from '@extension/router';
+import { Link, useRouterState } from '@extension/router';
 import { cn } from '@extension/ui';
+import { Tab, Tabs } from '@heroui/tabs';
 import { SIDE_PANEL_ROUTER_CONFIG } from '@src/features/router/constants';
 import type { FC } from 'react';
 import { memo } from 'react';
 
-interface NavItemProps {
-  to: string;
-  icon: React.ReactNode;
-  label?: string;
-}
-
-const NavItem = ({ to, icon, label }: NavItemProps) => {
-  const baseStyles = cn(
-    'flex items-center gap-2 px-4 py-2 rounded-full',
-    'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800',
-  );
-
-  const activeStyles = cn(
-    'text-black bg-zinc-200 hover:bg-zinc-200 font-medium dark:text-white dark:bg-zinc-700 dark:hover:bg-zinc-700',
-  );
-
-  return (
-    <Link to={to} className={baseStyles} activeProps={{ className: activeStyles }}>
-      {icon}
-      {label && <span className="text-sm">{label}</span>}
-    </Link>
-  );
-};
-
 const AppNav: FC = () => {
+  const router = useRouterState();
+
   return (
     <nav
       className={cn(
@@ -36,11 +15,23 @@ const AppNav: FC = () => {
         'border-t backdrop-blur-sm p-2',
         'bg-white/90 border-zinc-200 dark:bg-zinc-900/90 dark:border-zinc-800',
       )}>
-      <div className="flex gap-2 items-center justify-center max-w-lg mx-auto">
+      <Tabs
+        selectedKey={router.location.pathname}
+        className="flex gap-2 items-center justify-center max-w-lg mx-auto"
+        color="primary"
+        radius="full">
         {SIDE_PANEL_ROUTER_CONFIG.map(route => (
-          <NavItem key={route.path} to={route.path} icon={route.icon} label={route.label} />
+          <Tab
+            key={route.path}
+            title={
+              <Link to={route.path} className="flex items-center gap-2 px-3 py-2 rounded-full">
+                {route.icon}
+                {route.label && <span className="text-sm">{route.label}</span>}
+              </Link>
+            }
+          />
         ))}
-      </div>
+      </Tabs>
     </nav>
   );
 };

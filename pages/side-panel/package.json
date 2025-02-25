@@ -30,6 +30,7 @@
     "@heroui/input": "^2.4.13",
     "@heroui/switch": "^2.2.12",
     "@heroui/system": "^2.4.10",
+    "@heroui/tabs": "^2.2.11",
     "@heroui/theme": "^2.4.9",
     "@tabler/icons-react": "^3.30.0",
     "framer-motion": "^12.4.7"

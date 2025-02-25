@@ -29,8 +29,8 @@ const Home: FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center px-4">
-      <Form className="w-full flex flex-col items-center justify-center" onSubmit={onSubmit}>
+    <div className="flex flex-col gap-4 items-center justify-center px-4">
+      <Form className="w-full flex flex-col items-center gap-2 justify-center" onSubmit={onSubmit}>
         <Textarea
           isRequired
           errorMessage="必须输入您的文字"
@@ -40,15 +40,18 @@ const Home: FC = () => {
           minRows={10}
           maxRows={20}
         />
-        <Button type="submit" isLoading={loading} className="mt-4">
-          {loading ? '提交中...' : '提交'}
-        </Button>
-        {submitted && (
-          <div className="text-small text-default-500">
-            You submitted: <code>{JSON.stringify(submitted)}</code>
-          </div>
-        )}
+        <div className="flex gap-2 items-center justify-center">
+          <Button type="reset">重置</Button>
+          <Button type="submit" color="primary" isLoading={loading}>
+            {loading ? '提交中...' : '提交'}
+          </Button>
+        </div>
       </Form>
+      {submitted && (
+        <div className="text-small text-default-500">
+          You submitted: <code>{JSON.stringify(submitted)}</code>
+        </div>
+      )}
     </div>
   );
 };
