@@ -6,7 +6,7 @@ import { IconMoon, IconSun } from '@tabler/icons-react';
 import type { FC } from 'react';
 import { memo } from 'react';
 
-const SwitchTheme: FC = () => {
+const AppSwitchTheme: FC = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
 
@@ -21,4 +21,4 @@ const SwitchTheme: FC = () => {
   );
 };
 
-export default memo(SwitchTheme);
+export default memo(AppSwitchTheme);

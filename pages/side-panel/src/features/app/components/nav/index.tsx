@@ -1,13 +1,13 @@
 import { Link } from '@extension/router';
 import { cn } from '@extension/ui';
-import { IconMusic, IconTypography, IconVideo } from '@tabler/icons-react';
+import { SIDE_PANEL_ROUTER_CONFIG } from '@src/features/router/constants';
 import type { FC } from 'react';
 import { memo } from 'react';
 
 interface NavItemProps {
   to: string;
   icon: React.ReactNode;
-  label: string;
+  label?: string;
 }
 
 const NavItem = ({ to, icon, label }: NavItemProps) => {
@@ -23,12 +23,12 @@ const NavItem = ({ to, icon, label }: NavItemProps) => {
   return (
     <Link to={to} className={baseStyles} activeProps={{ className: activeStyles }}>
       {icon}
-      <span className="text-sm">{label}</span>
+      {label && <span className="text-sm">{label}</span>}
     </Link>
   );
 };
 
-const Nav: FC = () => {
+const AppNav: FC = () => {
   return (
     <nav
       className={cn(
@@ -37,12 +37,12 @@ const Nav: FC = () => {
         'bg-white/90 border-zinc-200 dark:bg-zinc-900/90 dark:border-zinc-800',
       )}>
       <div className="flex gap-2 items-center justify-center max-w-lg mx-auto">
-        <NavItem to="/" icon={<IconTypography size={18} />} label="文字" />
-        <NavItem to="/audio" icon={<IconMusic size={18} />} label="音频" />
-        <NavItem to="/video" icon={<IconVideo size={18} />} label="视频" />
+        {SIDE_PANEL_ROUTER_CONFIG.map(route => (
+          <NavItem key={route.path} to={route.path} icon={route.icon} label={route.label} />
+        ))}
       </div>
     </nav>
   );
 };
 
-export default memo(Nav);
+export default memo(AppNav);

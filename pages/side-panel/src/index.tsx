@@ -4,7 +4,7 @@ import { RouterProvider } from '@extension/router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { Providers } from './features/provider';
+import { AppProviders } from './features/app/components/provider';
 import { router } from './features/router';
 
 function init() {
@@ -15,9 +15,9 @@ function init() {
   const root = createRoot(appContainer);
   root.render(
     <StrictMode>
-      <Providers>
+      <AppProviders>
         <RouterProvider router={router} />
-      </Providers>
+      </AppProviders>
     </StrictMode>,
   );
 }

@@ -2,9 +2,9 @@ import { useRouterState } from '@extension/router';
 import type { FC } from 'react';
 import { memo } from 'react';
 
-import SwitchTheme from '../switch-theme';
+import AppSwitchTheme from '../switch-theme';
 
-const Header: FC = () => {
+const AppHeader: FC = () => {
   const router = useRouterState();
 
   const stateMap: Record<string, string> = {
@@ -16,9 +16,9 @@ const Header: FC = () => {
   return (
     <div className="flex items-center justify-between py-4 px-6">
       <h2 className="text-lg font-bold">{stateMap[router.location.pathname]}</h2>
-      <SwitchTheme />
+      <AppSwitchTheme />
     </div>
   );
 };
 
-export default memo(Header);
+export default memo(AppHeader);
