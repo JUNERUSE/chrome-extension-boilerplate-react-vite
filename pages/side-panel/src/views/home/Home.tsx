@@ -10,8 +10,8 @@ export function Home() {
     chrome.tabs.create({ url: 'https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite' });
 
   return (
-    <div className={`App ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
-      <header className={`App-header ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
+    <div className={`App`}>
+      <header className={`App-header ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>
         <button onClick={goGithubSite}>
           <img src={chrome.runtime.getURL(logo)} className="App-logo" alt="logo" />
         </button>

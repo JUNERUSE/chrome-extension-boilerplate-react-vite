@@ -13,12 +13,12 @@ interface NavItemProps {
 const NavItem = ({ to, icon, label, isLight }: NavItemProps) => {
   const baseStyles = cn(
     'flex items-center gap-2 px-4 py-2 rounded-full',
-    isLight ? 'text-gray-600 hover:bg-gray-100' : 'text-gray-400 hover:bg-gray-800',
+    isLight ? 'text-zinc-600 hover:bg-zinc-100' : 'text-zinc-400 hover:bg-zinc-800',
   );
 
   const activeStyles = cn(
     'flex items-center gap-2 px-4 py-2 rounded-full',
-    isLight ? 'text-blue-600 bg-blue-50 font-medium' : 'text-blue-400 bg-blue-900/30 font-medium',
+    isLight ? 'text-black bg-zinc-200 font-medium' : 'text-white bg-zinc-700 font-medium',
   );
 
   return (
@@ -61,7 +61,7 @@ export function Nav() {
       className={cn(
         'fixed bottom-0 left-0 right-0 z-50',
         'border-t backdrop-blur-sm p-2',
-        isLight ? 'bg-white/90 border-gray-200' : 'bg-gray-900/90 border-gray-800',
+        isLight ? 'bg-white/90 border-zinc-200' : 'bg-zinc-900/90 border-zinc-800',
       )}>
       <div className="flex gap-2 items-center justify-center max-w-lg mx-auto">
         <NavItem to="/" icon={<HomeIcon />} label="首页" isLight={isLight} />

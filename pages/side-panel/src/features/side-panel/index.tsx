@@ -1,9 +1,8 @@
 import { Outlet } from '@extension/router';
-import './SidePanel.css';
-import BaseLayout from './features/shared/layouts/BaseLayout';
 import { withErrorBoundary, withSuspense } from '@extension/shared';
+import BaseLayout from '../layout/BaseLayout';
 
-const SidePanel = () => {
+const SidePanelBase = () => {
   return (
     <BaseLayout>
       <Outlet />
@@ -11,7 +10,7 @@ const SidePanel = () => {
   );
 };
 
-export default withErrorBoundary(
-  withSuspense(SidePanel, <div className="text-center p-4">加载中...</div>),
+export const SidePanel = withErrorBoundary(
+  withSuspense(SidePanelBase, <div className="text-center p-4">加载中...</div>),
   <div className="text-center p-4 text-red-500">发生错误</div>,
 );

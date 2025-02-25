@@ -8,9 +8,9 @@ export function Settings() {
   return (
     <div className={`flex-1 p-4`}>
       <div className="max-w-lg mx-auto">
-        <h1 className={`text-2xl font-bold mb-6 ${isLight ? 'text-gray-900' : 'text-white'}`}>设置</h1>
-        <div className={`rounded-lg p-4 ${isLight ? 'bg-white' : 'bg-gray-900'}`}>
-          <p className={isLight ? 'text-gray-600' : 'text-gray-400'}>这里是设置页面</p>
+        <h1 className={`text-2xl font-bold mb-6 ${isLight ? 'text-zinc-900' : 'text-white'}`}>设置</h1>
+        <div className={`rounded-lg p-4 ${isLight ? 'bg-white' : 'bg-zinc-900'}`}>
+          <p className={isLight ? 'text-zinc-600' : 'text-zinc-400'}>这里是设置页面</p>
         </div>
       </div>
     </div>

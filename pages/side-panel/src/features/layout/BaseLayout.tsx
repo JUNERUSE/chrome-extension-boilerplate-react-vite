@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
-import { Nav } from '../components/Nav';
 import { useStorage } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
-import { SwitchTheme } from '../components/SwitchTheme';
+import { SwitchTheme } from '../shared/components/SwitchTheme';
+import { Nav } from '../shared/components/Nav';
 
 type Props = {
   children: ReactNode;
@@ -13,9 +13,9 @@ const BaseLayout = ({ children }: Props) => {
   const isLight = theme === 'light';
 
   return (
-    <div className={`App min-h-screen py-16 ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
+    <div className={`App min-h-screen py-16 ${isLight ? 'bg-white' : 'bg-black'}`}>
       <SwitchTheme />
-      <div className={`${isLight ? 'text-gray-900' : 'text-gray-100'}`}>{children}</div>
+      <div className={`${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>{children}</div>
       <Nav />
     </div>
   );

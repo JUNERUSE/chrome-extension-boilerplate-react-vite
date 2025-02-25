@@ -3,7 +3,7 @@
  */
 export const canSwitchTheme = async () => {
   const LIGHT_THEME_CLASS = 'bg-slate-50';
-  const DARK_THEME_CLASS = 'bg-gray-800';
+  const DARK_THEME_CLASS = 'bg-zinc-800';
   const TOGGLE_BUTTON_TEXT = 'Toggle theme';
 
   const app = await $('.App').getElement();

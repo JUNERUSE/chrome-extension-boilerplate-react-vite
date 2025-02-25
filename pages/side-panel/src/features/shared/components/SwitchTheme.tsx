@@ -16,7 +16,7 @@ export function SwitchTheme() {
         title={t('toggleTheme')}
         className={`
           p-2 rounded-full
-          ${isLight ? 'hover:bg-gray-100 active:bg-gray-200' : 'hover:bg-gray-800 active:bg-gray-700'}
+          ${isLight ? 'hover:bg-zinc-100 active:bg-zinc-200' : 'hover:bg-zinc-800 active:bg-zinc-700'}
         `}>
         {isLight ? (
           <svg

@@ -14,8 +14,8 @@ const NewTab = () => {
 
   console.log(t('hello', 'World'));
   return (
-    <div className={`App ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
-      <header className={`App-header ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
+    <div className={`App ${isLight ? 'bg-slate-50' : 'bg-zinc-800'}`}>
+      <header className={`App-header ${isLight ? 'text-zinc-900' : 'text-zinc-100'}`}>
         <button onClick={goGithubSite}>
           <img src={chrome.runtime.getURL(logo)} className="App-logo" alt="logo" />
         </button>
