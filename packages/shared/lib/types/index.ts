@@ -1,7 +1,4 @@
-import type { Options, SearchParamsOption } from 'ky';
-
-// 使用封装的ky客户端发送请求
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+import type { Input, Options, SearchParamsOption } from 'ky';
 
 // 定义消息类型
 export interface Message<T = unknown> {
@@ -26,8 +23,8 @@ export interface ApiOptions {
 
 // 请求参数接口
 export interface ApiRequestParams<Config = Options, Data = object, Params = SearchParamsOption> {
-  url: string;
-  method?: HttpMethod;
+  url: Input;
+  method?: Options['method'];
   data?: Data;
   params?: Params;
   config?: Config;

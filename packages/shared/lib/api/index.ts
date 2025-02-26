@@ -1,27 +1,11 @@
+import type { Options } from 'ky';
 import ky from 'ky';
-
-import type { ApiOptions } from '../types/index.js';
-
-// 创建默认API选项
-const defaultOptions: ApiOptions = {
-  timeout: 30000,
-  retries: 2,
-};
 
 /**
  * 创建一个预配置的ky实例
  */
-export const createApiClient = (options: ApiOptions = {}) => {
-  const mergedOptions = { ...defaultOptions, ...options };
-
-  return ky.create({
-    timeout: mergedOptions.timeout,
-    headers: mergedOptions.headers,
-    retry: {
-      limit: mergedOptions.retries || 2,
-      methods: ['get', 'post', 'put', 'delete', 'patch'],
-      statusCodes: [408, 413, 429, 500, 502, 503, 504],
-    },
+export const createApiClient = (options?: Options) =>
+  ky.create({
     hooks: {
       beforeRequest: [
         request => {
@@ -44,8 +28,8 @@ export const createApiClient = (options: ApiOptions = {}) => {
         },
       ],
     },
+    ...options,
   });
-};
 
 // 导出默认API客户端实例
 export const apiClient = createApiClient();

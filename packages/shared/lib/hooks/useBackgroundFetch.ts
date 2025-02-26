@@ -49,8 +49,8 @@ export function useSWRBackgroundFetch<TResponse = unknown>(params: UseBackground
       return res;
     },
     {
-      revalidateOnFocus,
       errorRetryCount,
+      revalidateOnFocus,
       ...swrOptions,
     },
   );
