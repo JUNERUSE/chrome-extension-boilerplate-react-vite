@@ -1,6 +1,6 @@
-import Audio from '@src/router/audio';
-import Home from '@src/router/home';
-import Video from '@src/router/video';
+import Audio from '@src/pages/audio';
+import Home from '@src/pages/home';
+import Video from '@src/pages/video';
 import { IconMusic, IconTypography, IconVideo } from '@tabler/icons-react';
 
 import type { Route } from '../types';
