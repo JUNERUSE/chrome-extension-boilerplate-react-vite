@@ -1,11 +1,11 @@
 import 'webextension-polyfill';
 
 import { OPEN_SIDE_PANEL_CONTEXT_MENU_ID } from '@extension/shared';
-import { exampleThemeStorage } from '@extension/storage';
 
-exampleThemeStorage.get().then(theme => {
-  console.log('theme', theme);
-});
+import { initBackground } from './init';
+
+// 初始化
+initBackground();
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
