@@ -53,29 +53,3 @@ export const sendMessageToBackground = <R = unknown, T = unknown>(message: Messa
     }
   });
 };
-
-/**
- * 在background中注册消息处理器
- * @param handler 消息处理函数
- */
-export const registerMessageHandler = <T = unknown, R = unknown>(
-  handler: (message: Message<T>, sender: chrome.runtime.MessageSender) => Promise<Response<R>>,
-): void => {
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    // 返回true表示将异步发送响应
-    const promise = handler(message, sender);
-
-    promise
-      .then(response => {
-        sendResponse(response);
-      })
-      .catch(error => {
-        sendResponse({
-          success: false,
-          error: error instanceof Error ? error.message : String(error),
-        });
-      });
-
-    return true; // 重要：告诉Chrome我们会异步发送响应
-  });
-};

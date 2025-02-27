@@ -1,7 +1,7 @@
-import { initBackgroundService } from './service';
+import { initBackgroundMessage } from './message';
 import { initTheme } from './theme';
 
 export const initBackground = () => {
-  initBackgroundService();
+  initBackgroundMessage();
   initTheme();
 };
