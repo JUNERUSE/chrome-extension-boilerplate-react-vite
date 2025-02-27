@@ -12,12 +12,15 @@ const AppNav: FC = () => {
     <nav
       className={cn(
         'fixed bottom-0 left-0 right-0 z-50',
-        'border-t backdrop-blur-sm p-2',
+        'border-t backdrop-blur-sm py-2 px-4 w-full flex',
         'bg-white/90 border-zinc-200 dark:bg-zinc-900/90 dark:border-zinc-800',
       )}>
       <Tabs
         selectedKey={router.location.pathname}
-        className="flex gap-2 items-center justify-center max-w-lg mx-auto"
+        className="flex gap-2 items-center justify-center flex-1 mx-auto"
+        classNames={{
+          tabList: 'flex-1',
+        }}
         color="primary"
         radius="full">
         {SIDE_PANEL_ROUTER_CONFIG.map(route => (
