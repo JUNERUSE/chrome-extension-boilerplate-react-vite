@@ -1,10 +1,3 @@
-export interface JobResponse {
-  id: string;
-  status: string;
-  eta: number;
-  text: string;
-}
-
 export interface TTSResponse {
   id: string;
   status: string;

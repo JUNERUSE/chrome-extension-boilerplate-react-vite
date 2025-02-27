@@ -5,7 +5,7 @@ import { Select, SelectItem } from '@heroui/select';
 import AudioPlayer from '@src/features/audio/components';
 import { DEFAULT_VOICE_SETTINGS } from '@src/features/tts/constants';
 import { audioQualityOptions, languageOptions, speedOptions } from '@src/features/tts/constants/options';
-import type { JobResponse, TTSResponse, VoiceRSSParams } from '@src/features/tts/types';
+import type { TTSResponse, VoiceRSSParams } from '@src/features/tts/types';
 import { fetchVoiceRSS } from '@src/features/tts/utils';
 import type { FC } from 'react';
 import type React from 'react';
@@ -65,8 +65,8 @@ const Home: FC = () => {
         voiceSettings: {
           ...voiceSettings,
         },
-        onRequest: (jobData: JobResponse) => {
-          console.log('请求成功，获取到作业数据:', jobData);
+        onRequest: () => {
+          console.log('请求成功，获取到作业数据:');
         },
         onResponse: (data: TTSResponse) => {
           console.log('响应成功，获取到TTS数据:', data);

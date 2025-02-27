@@ -1,5 +1,5 @@
 import { DEFAULT_VOICE_SETTINGS, TTS_API_HEADERS, TTS_API_KEY, TTS_API_URL } from '../constants';
-import type { JobResponse, TTSResponse, VoiceRSSParams } from '../types';
+import type { TTSResponse, VoiceRSSParams } from '../types';
 
 /**
  * 使用 Voice RSS API 直接获取文本转语音的音频 URL
@@ -11,7 +11,7 @@ export const fetchVoiceRSS = async (
   text: string,
   options?: {
     voiceSettings?: Partial<VoiceRSSParams>;
-    onRequest?: (jobData: JobResponse) => void;
+    onRequest?: () => void;
     onResponse?: (data: TTSResponse) => void;
   },
 ) => {
@@ -27,16 +27,8 @@ export const fetchVoiceRSS = async (
     // 生成唯一 ID 用于跟踪请求
     const id = `tts-${Date.now()}`;
 
-    // 模拟原有 API 行为，创建一个 jobData 对象并调用 onRequest 回调
-    const jobData: JobResponse = {
-      id,
-      status: 'processing',
-      eta: 1, // Voice RSS API 处理很快，预计只需 1 秒
-      text,
-    };
-
     // 调用请求开始回调
-    options?.onRequest?.(jobData);
+    options?.onRequest?.();
 
     // 发起实际请求
     const apiUrl = `${TTS_API_URL}?key=${TTS_API_KEY}`;
@@ -61,22 +53,8 @@ export const fetchVoiceRSS = async (
     // 获取音频 blob
     const audioBlob = await response.blob();
 
-    // 检查响应类型和内容
-    const contentType = response.headers.get('Content-Type') || 'audio/mpeg';
-    console.log('音频响应内容类型:', contentType);
-
-    // 确保blob有正确的类型
-    const typedAudioBlob = new Blob([await audioBlob.arrayBuffer()], {
-      type: contentType.includes('audio') ? contentType : 'audio/mpeg',
-    });
-
-    // 检查音频大小
-    if (typedAudioBlob.size < 100) {
-      console.warn('警告: 音频数据异常小 (' + typedAudioBlob.size + ' bytes)');
-    }
-
-    // 在Chrome扩展中创建blob URL
-    const audioUrl = URL.createObjectURL(typedAudioBlob);
+    // 创建blob URL
+    const audioUrl = URL.createObjectURL(audioBlob);
 
     // 添加释放资源的函数
     const releaseUrl = () => {
@@ -90,7 +68,6 @@ export const fetchVoiceRSS = async (
 
     // 记录音频信息用于调试
     console.log('创建的音频URL:', audioUrl);
-    console.log('音频Blob大小:', typedAudioBlob.size, 'bytes');
 
     // 计算处理时间
     const jobTime = (Date.now() - startTime) / 1000;
