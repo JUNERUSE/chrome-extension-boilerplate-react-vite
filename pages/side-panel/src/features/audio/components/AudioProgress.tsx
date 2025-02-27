@@ -20,8 +20,8 @@ const AudioProgress = () => {
         onChange={handleProgress}
         value={progressPercentage}
         classNames={{
-          track: 'transition-all duration-100',
-          thumb: 'transition-transform duration-100',
+          track: '!transition-transform duration-100',
+          thumb: '!transition-transform duration-100',
         }}
       />
     </CardBody>

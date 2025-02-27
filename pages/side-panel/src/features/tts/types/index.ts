@@ -24,12 +24,18 @@ export type AudioQuality =
 
 export type Speed = '-10' | '-5' | '-2' | '0' | '2' | '5' | '10';
 
-// Voice RSS API 参数接口
+/**
+ * Voice RSS API 参数接口
+ */
 export interface VoiceRSSParams {
-  src: string; // 要转换的文本内容
-  hl: Language; // 语言和区域代码 (如 'en-us', 'zh-cn')
-  r: Speed; // 朗读速度 (-10 到 10)
-  c: AudioQuality; // 编码格式 (如 'mp3', 'wav')
-  f: AudioQuality; // 音频质量 (如 '8khz_8bit_mono', '16khz_16bit_stereo')
-  key?: string; // Voice RSS API 密钥
+  /** 要转换的文本内容 */
+  src: string;
+  /** 语言和区域代码 (如 'en-us', 'zh-cn') */
+  hl: Language;
+  /** 朗读速度 (-10 到 10) */
+  r: Speed;
+  /** 编码格式 (如 'mp3', 'wav') */
+  c: AudioQuality;
+  /** 音频质量 (如 '8khz_8bit_mono', '16khz_16bit_stereo') */
+  f: AudioQuality;
 }

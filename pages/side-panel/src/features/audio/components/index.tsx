@@ -20,7 +20,7 @@ const AudioPlayerContent = memo(() => {
 
   return (
     <Card
-      className="bg-default-100 transition-opacity duration-150"
+      className="bg-default-100"
       style={{ opacity: isAudioReady ? 1 : 0.7 }}
       shadow="none"
       isDisabled={!isAudioReady}>

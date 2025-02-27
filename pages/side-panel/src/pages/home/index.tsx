@@ -107,20 +107,34 @@ const Home: FC = () => {
 
   return (
     <div className="flex flex-col gap-4 items-center justify-center px-4 py-6 mb-14">
+      <div className="w-full">
+        <AudioPlayer
+          src={audioUrl}
+          title={audioTitle}
+          onEnded={() => {
+            console.log('音频播放完成');
+            // 可以在这里添加播放完成后的逻辑
+          }}
+        />
+      </div>
+
       <Form
         className="w-full flex flex-col items-center gap-3 justify-center"
         onSubmit={onSubmit}
         onReset={handleReset}>
         <Textarea
+          label="输入文字"
           isRequired
           errorMessage="必须输入您的文字"
-          labelPlacement="outside"
           name="text"
           placeholder="输入您要转换为语音的文字"
           minRows={5}
           maxRows={10}
           defaultValue="hello world"
           className="w-full"
+          classNames={{
+            inputWrapper: '!transition-transform',
+          }}
         />
 
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -152,28 +166,15 @@ const Home: FC = () => {
           </Select>
         </div>
 
-        <div className="flex gap-2 items-center justify-center mt-2">
-          <Button type="reset" isDisabled={loading}>
+        <div className="flex gap-2 items-center w-full justify-center">
+          <Button type="reset" isDisabled={loading} fullWidth className="!transition-transform">
             重置
           </Button>
-          <Button type="submit" color="primary" isLoading={loading}>
+          <Button type="submit" color="primary" isLoading={loading} fullWidth>
             {loading ? '生成中...' : '生成语音'}
           </Button>
         </div>
       </Form>
-
-      {audioUrl && (
-        <div className="mt-4 w-full">
-          <AudioPlayer
-            src={audioUrl}
-            title={audioTitle}
-            onEnded={() => {
-              console.log('音频播放完成');
-              // 可以在这里添加播放完成后的逻辑
-            }}
-          />
-        </div>
-      )}
     </div>
   );
 };
