@@ -5,7 +5,7 @@ import useSWR from 'swr';
 
 import { MessageTypes } from '../constants/background.js';
 import type { ApiRequestParams, Response } from '../types/index.js';
-import { fetchForBackground } from '../utils/fetch.js';
+import { fetchForBackground } from '../utils/fetch/index.js';
 import { sendMessageToBackground } from '../utils/messaging.js';
 
 // 扩展的 SWR 配置，作为 ApiRequestParams 的 config 参数类型

@@ -1,7 +1,5 @@
 import type { ApiRequestParams, Message, Response } from '@extension/shared';
-import { MessageTypes } from '@extension/shared';
-
-import { handleApiRequest } from '../utils/service';
+import { handleApiRequest, MessageTypes } from '@extension/shared';
 
 /**
  * 在background中注册消息处理器
