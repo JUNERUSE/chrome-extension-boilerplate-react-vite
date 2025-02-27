@@ -16,15 +16,15 @@ export const SIDE_PANEL_ROUTER_CONFIG: Route[] = [
     label: '文字',
   },
   {
+    path: '/video',
+    component: Video,
+    icon: <IconVideo size={18} />,
+    label: '字幕',
+  },
+  {
     path: '/audio',
     component: Audio,
     icon: <IconMusic size={18} />,
     label: '音频',
-  },
-  {
-    path: '/video',
-    component: Video,
-    icon: <IconVideo size={18} />,
-    label: '视频',
   },
 ];

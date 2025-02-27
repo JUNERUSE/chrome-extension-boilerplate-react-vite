@@ -9,8 +9,8 @@ const AppHeader: FC = () => {
 
   const stateMap: Record<string, string> = {
     '/': '文字转语音',
+    '/video': 'YouTube 字幕',
     '/audio': '音频传译',
-    '/video': '视频传译',
   };
 
   return (
