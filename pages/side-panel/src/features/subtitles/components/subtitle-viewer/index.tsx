@@ -6,11 +6,11 @@ import { Progress } from '@heroui/progress';
 import { Select, SelectItem } from '@heroui/select';
 import { IconArrowUp } from '@tabler/icons-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 
-import type { SubtitleData, SubtitleItem } from './db';
-import { subtitleDB } from './db';
-import { getYouTubeSubtitles, getYouTubeVideoId } from './youtube-subtitles';
+import type { SubtitleData, SubtitleItem } from '../../utils/db';
+import { subtitleDB } from '../../utils/db';
+import { getYouTubeSubtitles, getYouTubeVideoId } from '../../utils/youtube-subtitles';
 
 interface SubtitleViewerProps {
   videoUrl?: string;
@@ -290,4 +290,6 @@ const SubtitleViewer = forwardRef<SubtitleViewerRef, SubtitleViewerProps>(({ vid
   );
 });
 
-export default SubtitleViewer;
+SubtitleViewer.displayName = 'SubtitleViewer';
+
+export default memo(SubtitleViewer);

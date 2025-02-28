@@ -5,8 +5,8 @@ import { Input } from '@heroui/input';
 import type React from 'react';
 import { memo, useEffect, useRef, useState } from 'react';
 
-import { subtitleDB } from '../../features/subtitles/db';
-import SubtitleViewer, { type SubtitleViewerRef } from '../../features/subtitles/SubtitleViewer';
+import SubtitleViewer, { type SubtitleViewerRef } from '../../features/subtitles/components/subtitle-viewer';
+import { subtitleDB } from '../../features/subtitles/utils/db';
 
 // 定义tab更新事件的changeInfo类型
 interface TabChangeInfo {
