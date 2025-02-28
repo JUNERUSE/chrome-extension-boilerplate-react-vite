@@ -1,3 +1,5 @@
+import './features/audio-replacer';
+
 import { sampleFunction } from '@src/sampleFunction';
 
 console.log('content script loaded');
