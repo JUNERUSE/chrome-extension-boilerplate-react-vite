@@ -20,6 +20,7 @@ const AppNav: FC = () => {
         className="flex gap-2 items-center justify-center flex-1 mx-auto"
         classNames={{
           tabList: 'flex-1',
+          tabContent: 'flex-1',
         }}
         color="primary"
         radius="full">
@@ -27,7 +28,7 @@ const AppNav: FC = () => {
           <Tab
             key={route.path}
             title={
-              <Link to={route.path} className="flex items-center gap-2 px-3 py-2 rounded-full">
+              <Link to={route.path} className="flex justify-center flex-1 items-center gap-2 px-3 py-2 rounded-full">
                 {route.icon}
                 {route.label && <span className="text-sm">{route.label}</span>}
               </Link>

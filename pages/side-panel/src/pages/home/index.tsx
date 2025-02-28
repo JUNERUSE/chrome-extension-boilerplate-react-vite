@@ -106,7 +106,7 @@ const Home: FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 items-center justify-center px-4 py-6 mb-14">
+    <div className="flex flex-col gap-4 items-center justify-center p-4">
       <div className="w-full">
         <AudioPlayer
           src={audioUrl}
@@ -167,7 +167,7 @@ const Home: FC = () => {
         </div>
 
         <div className="flex gap-2 items-center w-full justify-center">
-          <Button type="reset" isDisabled={loading} fullWidth className="!transition-transform">
+          <Button type="reset" variant="flat" isDisabled={loading} fullWidth className="!transition-transform">
             重置
           </Button>
           <Button type="submit" color="primary" isLoading={loading} fullWidth>

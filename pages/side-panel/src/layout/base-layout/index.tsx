@@ -12,7 +12,7 @@ const BaseLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <main
       className={cn(
-        'min-h-screen text-foreground bg-background text-sm',
+        'min-h-screen text-foreground bg-background text-sm pb-16',
         isLight ? 'light bg-zinc-50' : 'dark bg-zinc-900',
       )}>
       <AppHeader />

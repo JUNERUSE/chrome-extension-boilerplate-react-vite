@@ -1,214 +1,167 @@
-import { Alert, Button, Card, CardBody, CardHeader, Divider, Spinner } from '@heroui/react';
-import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import { Button } from '@heroui/button';
+import { Card, CardBody, CardFooter, CardHeader } from '@heroui/card';
+import { Form } from '@heroui/form';
+import { Input } from '@heroui/input';
+import type React from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
-interface Subtitle {
-  startMs: number;
-  durationMs: number;
-  startTime: string;
-  endTime: string;
-  text: string;
+import { subtitleDB } from '../../features/subtitles/db';
+import SubtitleViewer, { type SubtitleViewerRef } from '../../features/subtitles/SubtitleViewer';
+
+// 定义tab更新事件的changeInfo类型
+interface TabChangeInfo {
+  url?: string;
+  status?: string;
+  pinned?: boolean;
+  audible?: boolean;
+  discarded?: boolean;
+  autoDiscardable?: boolean;
+  mutedInfo?: { muted: boolean };
+  favIconUrl?: string;
+  title?: string;
 }
 
-interface SubtitleData {
-  videoId: string;
-  language: string;
-  subtitles: Subtitle[];
-  timestamp: number;
+// 定义来自background的消息类型
+interface BackgroundMessage {
+  type: string;
+  url?: string;
 }
 
-const Video: FC = () => {
-  const [subtitleData, setSubtitleData] = useState<SubtitleData | null>(null);
-  const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+const Video: React.FC = () => {
+  const [videoUrl, setVideoUrl] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const subtitleViewerRef = useRef<SubtitleViewerRef>(null);
 
-  // 获取当前YouTube视频ID
+  // 检测当前标签页是否为YouTube视频页面
   useEffect(() => {
-    const getCurrentTab = async () => {
-      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const checkCurrentTab = async () => {
+      try {
+        // 获取当前活动的Chrome标签页
+        const queryOptions = { active: true, currentWindow: true };
+        const [tab] = await chrome.tabs.query(queryOptions);
 
-      if (tabs[0]?.url?.includes('youtube.com/watch')) {
-        try {
-          const url = new URL(tabs[0].url);
-          const videoId = url.searchParams.get('v');
-          if (videoId) {
-            setCurrentVideoId(videoId);
-            loadSubtitles(videoId);
-          }
-        } catch (err) {
-          console.error('获取视频ID失败:', err);
+        if (tab && tab.url && tab.url.includes('youtube.com/watch')) {
+          setVideoUrl(tab.url);
+          setInputValue(tab.url);
+        }
+      } catch (error) {
+        console.error('获取当前标签页失败:', error);
+      }
+    };
+
+    checkCurrentTab();
+
+    // 监听标签页更新事件
+    const handleTabUpdate = async (tabId: number, changeInfo: TabChangeInfo) => {
+      if (changeInfo.url) {
+        const url = changeInfo.url;
+        if (url.includes('youtube.com/watch')) {
+          setVideoUrl(url);
+          setInputValue(url);
         }
       }
     };
 
-    getCurrentTab();
+    chrome.tabs.onUpdated.addListener(handleTabUpdate);
+
+    // 监听来自background的消息
+    const handleBackgroundMessage = (message: BackgroundMessage) => {
+      if (message.type === 'YOUTUBE_VIDEO_DETECTED' && message.url) {
+        setVideoUrl(message.url);
+        setInputValue(message.url);
+      }
+    };
+
+    chrome.runtime.onMessage.addListener(handleBackgroundMessage);
+
+    return () => {
+      chrome.tabs.onUpdated.removeListener(handleTabUpdate);
+      chrome.runtime.onMessage.removeListener(handleBackgroundMessage);
+    };
   }, []);
 
-  // 监听storage变化，实时更新字幕
-  useEffect(() => {
-    const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => {
-      if (areaName !== 'local') return;
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-      // 检查是否有字幕相关更新
-      const subtitleKeys = Object.keys(changes).filter(key => key.startsWith('subtitles_'));
-      if (subtitleKeys.length > 0) {
-        // 找到当前视频的字幕更新
-        if (currentVideoId) {
-          const currentKey = `subtitles_${currentVideoId}`;
-          if (changes[currentKey]) {
-            const newValue = changes[currentKey].newValue as SubtitleData;
-            setSubtitleData(newValue);
-          }
+    try {
+      // 使用内部 state 的值
+      if (inputValue) {
+        // 验证是否是有效的 YouTube 视频链接
+        if (!inputValue.includes('youtube.com/watch') && !inputValue.includes('youtu.be/')) {
+          subtitleViewerRef.current?.reset();
+          console.error('请输入有效的 YouTube 视频链接');
+          return;
         }
+        setVideoUrl(inputValue);
+        return;
       }
-    };
 
-    chrome.storage.onChanged.addListener(handleStorageChange);
-    return () => chrome.storage.onChanged.removeListener(handleStorageChange);
-  }, [currentVideoId]);
-
-  // 加载字幕数据
-  const loadSubtitles = (videoId: string) => {
-    setLoading(true);
-    setError(null);
-
-    chrome.storage.local.get([`subtitles_${videoId}`], result => {
-      const key = `subtitles_${videoId}`;
-      if (result[key]) {
-        setSubtitleData(result[key]);
-      } else {
-        setError('未找到字幕数据，请先点击YouTube播放器上的字幕按钮获取字幕');
+      // 如果输入框为空，则尝试获取当前标签页 URL
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (activeTab?.url?.includes('youtube.com/watch')) {
+        const url = activeTab.url;
+        setVideoUrl(url);
+        setInputValue(url);
+        return;
       }
-      setLoading(false);
-    });
+
+      console.error('请输入 YouTube 视频链接或打开 YouTube 视频页面');
+    } catch (error) {
+      console.error('获取视频信息失败:', error);
+    }
   };
 
-  // 清空字幕数据
-  const clearSubtitles = () => {
-    if (!currentVideoId || !subtitleData) return;
-
-    const key = `subtitles_${currentVideoId}`;
-    chrome.storage.local.remove(key, () => {
-      setSubtitleData(null);
-
-      // 显示成功消息
-      setError(null);
-      setLoading(false);
-      alert('字幕数据已清空');
-    });
-  };
-
-  // 格式化时间为可读格式
-  const formatTimeForDisplay = (timeString: string) => {
-    // 将 00:00:00.000 格式转换为 00:00:00
-    return timeString.split('.')[0];
-  };
-
-  // 复制字幕到剪贴板
-  const copySubtitles = () => {
-    if (!subtitleData) return;
-
-    const formattedSubtitles = subtitleData.subtitles
-      .map((subtitle, index) => {
-        return `${index + 1}\n${subtitle.startTime} --> ${subtitle.endTime}\n${subtitle.text}\n`;
-      })
-      .join('\n');
-
-    navigator.clipboard
-      .writeText(formattedSubtitles)
-      .then(() => {
-        alert('字幕已复制到剪贴板');
-      })
-      .catch(err => {
-        console.error('复制字幕失败:', err);
-        alert('复制字幕失败');
-      });
+  const handleReset = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      // 清除所有字幕数据
+      await subtitleDB.clearAllSubtitles();
+      // 重置所有状态
+      setVideoUrl('');
+      setInputValue('');
+      // 重置 SubtitleViewer 组件状态
+      subtitleViewerRef.current?.reset();
+    } catch (error) {
+      console.error('重置失败:', error);
+    }
   };
 
   return (
-    <div className="flex flex-col w-full h-full p-4 overflow-auto">
-      {loading && (
-        <div className="flex justify-center items-center py-8">
-          <Spinner size="lg" color="primary" />
-        </div>
-      )}
+    <div className="p-4 space-y-4">
+      <Card shadow="none" className="border border-default-100">
+        <CardHeader className="flex flex-col gap-3 items-stretch">
+          <h2 className="text-lg font-medium text-foreground">视频解析</h2>
+        </CardHeader>
 
-      {error && (
-        <Alert className="mb-4" color="danger">
-          {error}
-        </Alert>
-      )}
+        <CardBody className="gap-2">
+          <Form onSubmit={handleSubmit} onReset={handleReset} className="items-stretch">
+            <Input
+              label="链接"
+              type="url"
+              name="videoUrl"
+              placeholder="输入YouTube视频URL"
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              fullWidth
+            />
+            <div className="flex gap-2 flex-1">
+              <Button type="reset" variant="flat" fullWidth>
+                重置
+              </Button>
+              <Button type="submit" color="primary" fullWidth>
+                加载
+              </Button>
+            </div>
+          </Form>
+        </CardBody>
+        <CardFooter className="text-sm text-gray-500">
+          在YouTube上打开视频时，将自动获取字幕。您也可以手动输入视频URL并点击加载。
+        </CardFooter>
+      </Card>
 
-      {subtitleData && (
-        <>
-          <Card className="mb-4">
-            <CardHeader className="flex gap-3">
-              <div>
-                <p className="text-md font-semibold">字幕信息</p>
-              </div>
-            </CardHeader>
-            <CardBody>
-              <div className="space-y-2">
-                <p>
-                  <span className="font-semibold">视频ID:</span> {subtitleData.videoId}
-                </p>
-                <p>
-                  <span className="font-semibold">语言:</span> {subtitleData.language}
-                </p>
-                <p>
-                  <span className="font-semibold">字幕数量:</span> {subtitleData.subtitles.length}
-                </p>
-                <div className="flex space-x-2 mt-4">
-                  <Button color="primary" onPress={copySubtitles}>
-                    复制所有字幕
-                  </Button>
-                  <Button color="danger" variant="flat" onPress={clearSubtitles}>
-                    清空字幕
-                  </Button>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-
-          <Card>
-            <CardBody className="p-0">
-              <div className="max-h-[500px] overflow-y-auto">
-                {subtitleData.subtitles.map((subtitle, index) => (
-                  <div key={index} className="p-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">
-                        {formatTimeForDisplay(subtitle.startTime)} - {formatTimeForDisplay(subtitle.endTime)}
-                      </span>
-                    </div>
-                    <p className="mt-2">{subtitle.text}</p>
-                    {index !== subtitleData.subtitles.length - 1 && <Divider className="mt-3" />}
-                  </div>
-                ))}
-              </div>
-            </CardBody>
-          </Card>
-        </>
-      )}
-
-      {!subtitleData && !loading && !error && currentVideoId && (
-        <Card className="w-full">
-          <CardBody className="flex flex-col items-center justify-center py-8">
-            <p className="text-center mb-2">还没有字幕数据</p>
-            <p className="text-center text-default-500">请点击YouTube播放器上的字幕按钮来获取字幕</p>
-          </CardBody>
-        </Card>
-      )}
-
-      {!currentVideoId && !loading && (
-        <Card className="w-full">
-          <CardBody className="flex flex-col items-center justify-center py-8">
-            <p className="text-center text-default-500">请打开一个YouTube视频页面</p>
-          </CardBody>
-        </Card>
-      )}
+      <SubtitleViewer ref={subtitleViewerRef} videoUrl={videoUrl} />
     </div>
   );
 };
 
-export default Video;
+export default memo(Video);

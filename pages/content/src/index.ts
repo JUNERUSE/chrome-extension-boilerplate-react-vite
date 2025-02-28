@@ -5,7 +5,7 @@ console.log('content script loaded');
 // Shows how to call a function defined in another module
 sampleFunction();
 
-// YouTube字幕获取功能
+// YouTube视频页面按钮添加功能
 if (window.location.href.includes('youtube.com/watch')) {
   console.log('YouTube视频页面检测到，准备添加字幕按钮');
 
@@ -36,7 +36,7 @@ if (window.location.href.includes('youtube.com/watch')) {
       subtitleButton.title = '获取字幕';
 
       // 调整样式以匹配YouTube原生按钮
-      subtitleButton.style.backgroundColor = 'transparent'; // 透明背景
+      subtitleButton.style.backgroundColor = 'transparent';
       subtitleButton.style.color = 'inherit';
       subtitleButton.style.border = 'none';
       subtitleButton.style.padding = '0';
@@ -53,51 +53,42 @@ if (window.location.href.includes('youtube.com/watch')) {
       subtitleButton.addEventListener('mouseenter', () => {
         const path = subtitleButton.querySelector('path');
         if (path) {
-          path.setAttribute('fill', '#ff0000'); // 悬停时变红
+          path.setAttribute('fill', '#ff0000');
         }
       });
 
       subtitleButton.addEventListener('mouseleave', () => {
         const path = subtitleButton.querySelector('path');
         if (path) {
-          path.setAttribute('fill', 'white'); // 离开时恢复白色
+          path.setAttribute('fill', 'white');
         }
       });
 
       // 添加点击事件
       subtitleButton.addEventListener('click', event => {
-        event.stopPropagation(); // 防止事件冒泡
-
+        event.stopPropagation();
         console.log('字幕按钮被点击');
 
-        // 获取当前视频ID
-        const videoId = new URL(window.location.href).searchParams.get('v');
-
-        if (!videoId) {
-          console.error('无法获取视频ID');
-          return;
-        }
-
-        // 获取并打印字幕
-        getSubtitles(videoId);
-
-        // 显示YouTube风格的提示
-        showYouTubeStyleToast('正在获取字幕...');
+        // 触发扩展图标点击效果
+        chrome.runtime
+          .sendMessage({
+            type: 'TRIGGER_BADGE_CLICK',
+            url: window.location.href,
+          })
+          .catch(() => {
+            showYouTubeStyleToast('正在打开字幕查看器...');
+          });
       });
 
       // 添加到播放器控制栏
-      // 找到一个合适的位置插入按钮
       const miniplayerButton = playerControls.querySelector('.ytp-miniplayer-button');
       const fullscreenButton = playerControls.querySelector('.ytp-fullscreen-button');
 
       if (miniplayerButton) {
-        // 放置在画中画按钮之前
         playerControls.insertBefore(subtitleButton, miniplayerButton);
       } else if (fullscreenButton) {
-        // 或者放置在全屏按钮之前
         playerControls.insertBefore(subtitleButton, fullscreenButton);
       } else {
-        // 如果都找不到，添加到控制栏末尾
         playerControls.appendChild(subtitleButton);
       }
       console.log('字幕按钮已成功添加');
@@ -116,190 +107,6 @@ if (window.location.href.includes('youtube.com/watch')) {
       console.log('停止尝试添加字幕按钮');
     }
   }, 60000);
-}
-
-// 定义字幕相关接口
-interface Subtitle {
-  startMs: number;
-  durationMs: number;
-  startTime: string;
-  endTime: string;
-  text: string;
-}
-
-interface YouTubeSegment {
-  utf8: string;
-}
-
-interface YouTubeSubtitleEvent {
-  tStartMs: number;
-  dDurationMs: number;
-  segs: YouTubeSegment[];
-}
-
-interface YouTubePlayerResponse {
-  videoDetails: {
-    videoId: string;
-  };
-  captions?: {
-    playerCaptionsTracklistRenderer?: {
-      captionTracks?: Array<{
-        languageCode: string;
-        name?: { simpleText: string };
-        baseUrl: string;
-      }>;
-    };
-  };
-}
-
-// 获取视频字幕
-function getSubtitles(videoId: string) {
-  try {
-    console.log('正在获取视频字幕，视频ID:', videoId);
-
-    // 获取ytInitialPlayerResponse对象
-    let player: YouTubePlayerResponse =
-      (window as Window & { ytInitialPlayerResponse?: YouTubePlayerResponse }).ytInitialPlayerResponse ||
-      ({} as YouTubePlayerResponse);
-
-    // 如果没有直接获取到，尝试从页面HTML中解析
-    if (!player || player.videoDetails.videoId !== videoId) {
-      const YT_INITIAL_PLAYER_RESPONSE_RE =
-        /ytInitialPlayerResponse\s*=\s*({.+?})\s*;\s*(?:var\s+(?:meta|head)|<\/script|\n)/;
-      const pageHtml = document.documentElement.innerHTML;
-      const match = pageHtml.match(YT_INITIAL_PLAYER_RESPONSE_RE);
-
-      if (match && match[1]) {
-        try {
-          player = JSON.parse(match[1]) as YouTubePlayerResponse;
-        } catch (e) {
-          console.error('解析ytInitialPlayerResponse失败:', e);
-          showYouTubeStyleToast('解析视频数据失败');
-          return;
-        }
-      }
-    }
-
-    if (!player || !player.captions) {
-      console.error('无法获取视频数据或该视频没有字幕');
-      showYouTubeStyleToast('该视频可能没有字幕');
-      return;
-    }
-
-    // 获取字幕轨道
-    const captionTracks: Array<{
-      languageCode: string;
-      name?: { simpleText: string };
-      baseUrl: string;
-    }> = player.captions?.playerCaptionsTracklistRenderer?.captionTracks || [];
-
-    if (!captionTracks || captionTracks.length === 0) {
-      console.error('该视频没有可用字幕');
-      showYouTubeStyleToast('该视频没有可用字幕');
-      return;
-    }
-
-    // 选择字幕轨道（优先选择中文或英文）
-    let selectedTrack = captionTracks.find(
-      track => track.languageCode === 'zh-Hans' || track.languageCode === 'zh-CN' || track.languageCode === 'zh',
-    );
-    if (!selectedTrack) {
-      selectedTrack = captionTracks.find(track => track.languageCode === 'en');
-    }
-    if (!selectedTrack) {
-      selectedTrack = captionTracks[0]; // 如果没有中文或英文，选择第一个
-    }
-
-    console.log('选择字幕语言:', selectedTrack.languageCode, selectedTrack.name?.simpleText);
-    showYouTubeStyleToast(`正在获取${selectedTrack.name?.simpleText || ''}字幕...`);
-
-    // 获取字幕内容
-    fetch(`${selectedTrack.baseUrl}&fmt=json3`)
-      .then(response => response.json())
-      .then(data => {
-        if (!data || !data.events) {
-          showYouTubeStyleToast('字幕数据格式异常');
-          return;
-        }
-
-        // 处理字幕数据
-        const subtitles = data.events
-          .filter((event: YouTubeSubtitleEvent) => event.segs) // 过滤有效字幕段
-          .map((event: YouTubeSubtitleEvent) => {
-            return {
-              startMs: event.tStartMs,
-              durationMs: event.dDurationMs,
-              startTime: formatMilliseconds(event.tStartMs),
-              endTime: formatMilliseconds(event.tStartMs + event.dDurationMs),
-              text: event.segs
-                .map((seg: YouTubeSegment) => seg.utf8)
-                .join(' ')
-                .trim(),
-            };
-          })
-          .filter((subtitle: Subtitle) => subtitle.text); // 过滤空字幕
-
-        console.log('成功获取字幕数据，共', subtitles.length, '条');
-
-        // 打印字幕数据
-        printSubtitles(subtitles, videoId, selectedTrack.languageCode);
-
-        // 保存当前获取的字幕
-        chrome.runtime.sendMessage({
-          action: 'saveSubtitles',
-          data: {
-            videoId,
-            language: selectedTrack.languageCode,
-            subtitles,
-          },
-        });
-
-        showYouTubeStyleToast(`成功获取${subtitles.length}条字幕`);
-      })
-      .catch(error => {
-        console.error('获取字幕数据失败:', error);
-        showYouTubeStyleToast('获取字幕数据失败');
-      });
-  } catch (error) {
-    console.error('获取字幕时出错:', error);
-    showYouTubeStyleToast('获取字幕时出错');
-  }
-}
-
-// 格式化毫秒为时间字符串 (HH:MM:SS.mmm)
-function formatMilliseconds(ms: number): string {
-  const seconds = Math.floor(ms / 1000);
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = seconds % 60;
-  const milliseconds = ms % 1000;
-
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
-}
-
-// 打印字幕
-function printSubtitles(
-  subtitles: Array<{ startMs: number; durationMs: number; startTime: string; endTime: string; text: string }>,
-  videoId: string,
-  language: string,
-) {
-  // 创建一个格式化的字幕文本
-  const formattedSubtitles = subtitles
-    .map((subtitle, index) => {
-      return `${index + 1}\n${subtitle.startTime} --> ${subtitle.endTime}\n${subtitle.text}\n`;
-    })
-    .join('\n');
-
-  // 发送到后台脚本进行打印
-  chrome.runtime.sendMessage({
-    action: 'printSubtitle',
-    data: {
-      videoId: videoId,
-      language: language,
-      fullText: formattedSubtitles,
-      subtitles: subtitles,
-    },
-  });
 }
 
 // 显示YouTube风格的提示toast
