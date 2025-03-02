@@ -117,7 +117,6 @@ const Audio = () => {
             <ConnectionStatusIndicator connectionStatus={connectionStatus} onRefresh={handleRefreshConnection} />
           </div>
           <p className="text-sm text-gray-500 mt-1">支持格式：MP3, WAV, OGG</p>
-          {isDisabled && <p className="text-sm text-red-500 mt-1">请打开 YouTube 视频页面以启用音频替换功能</p>}
         </CardHeader>
         <CardBody className="space-y-4">{renderContent()}</CardBody>
       </Card>

@@ -1,6 +1,6 @@
 import 'webextension-polyfill';
 
-import { OPEN_SIDE_PANEL_CONTEXT_MENU_ID } from '@extension/shared';
+import { OPEN_POPUP_CONTEXT_MENU_ID, OPEN_SIDE_PANEL_CONTEXT_MENU_ID } from '@extension/shared';
 
 import { initBackground } from './init';
 
@@ -14,11 +14,21 @@ chrome.runtime.onInstalled.addListener(() => {
     title: 'Open side panel',
     contexts: ['all'],
   });
+
+  // 创建打开popup的右键菜单
+  chrome.contextMenus.create({
+    id: OPEN_POPUP_CONTEXT_MENU_ID,
+    title: 'Open popup',
+    contexts: ['all'],
+  });
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === OPEN_SIDE_PANEL_CONTEXT_MENU_ID && tab?.windowId) {
     chrome.sidePanel.open({ windowId: tab.windowId });
+  } else if (info.menuItemId === OPEN_POPUP_CONTEXT_MENU_ID && tab?.id) {
+    // 打开popup
+    chrome.action.openPopup();
   }
 });
 
