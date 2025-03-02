@@ -161,8 +161,17 @@ export const useConnectionStatus = (): ConnectionState => {
       checkConnectionStatus();
     };
 
+    // 监听页面变化消息
+    const handleMessage = (message: { type: string; isYoutubePage?: boolean }) => {
+      if (message.type === 'PAGE_CHANGE') {
+        console.log('连接状态钩子收到页面变化通知，重新检查连接状态');
+        checkConnectionStatus();
+      }
+    };
+
     chrome.tabs.onActivated.addListener(handleTabChange);
     chrome.tabs.onUpdated.addListener(handleTabChange);
+    chrome.runtime.onMessage.addListener(handleMessage);
 
     return () => {
       if (connectionCheckIntervalRef.current) {
@@ -170,6 +179,7 @@ export const useConnectionStatus = (): ConnectionState => {
       }
       chrome.tabs.onActivated.removeListener(handleTabChange);
       chrome.tabs.onUpdated.removeListener(handleTabChange);
+      chrome.runtime.onMessage.removeListener(handleMessage);
     };
   }, [checkConnectionStatus]);
 

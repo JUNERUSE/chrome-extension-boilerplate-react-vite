@@ -4,11 +4,10 @@ import { motion } from 'framer-motion';
 import type { FC } from 'react';
 
 import { ConnectionStatus } from '../hooks';
-import AudioPlayer from './index';
 
 interface AudioFileInfoProps {
   audioFile: File | null;
-  audioUrl: string;
+  audioUrl?: string;
   isReplacing: boolean;
   isReplaced: boolean;
   isVideoLoading: boolean;
@@ -21,7 +20,7 @@ interface AudioFileInfoProps {
 
 const AudioFileInfo: FC<AudioFileInfoProps> = ({
   audioFile,
-  audioUrl,
+  // audioUrl,
   isReplacing,
   isReplaced,
   isVideoLoading,
@@ -67,7 +66,7 @@ const AudioFileInfo: FC<AudioFileInfoProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0 }}
       className="space-y-4">
       <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
         <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/30">
@@ -80,7 +79,7 @@ const AudioFileInfo: FC<AudioFileInfoProps> = ({
           </p>
         </div>
       </div>
-      <AudioPlayer src={audioUrl} title={audioFile?.name} />
+      {/* <AudioPlayer src={audioUrl} title={audioFile?.name} /> */}
 
       <div className="flex items-center justify-between gap-2">
         <Button isIconOnly variant="light" color="danger" onPress={onDelete} className="shrink-0" isDisabled={disabled}>

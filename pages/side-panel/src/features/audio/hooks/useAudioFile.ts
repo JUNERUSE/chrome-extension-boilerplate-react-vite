@@ -9,6 +9,7 @@ export interface AudioFileState {
   isReplacing: boolean;
   isReplaced: boolean;
   isVideoLoading: boolean;
+  isInitialized: boolean;
   handleAudioFile: (file: File) => void;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleReplace: () => Promise<void>;
@@ -26,6 +27,7 @@ export const useAudioFile = (
   const [isReplacing, setIsReplacing] = useState(false);
   const [isReplaced, setIsReplaced] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const previousUrlRef = useRef<string>('');
   const currentVideoIdRef = useRef<string | null>(null);
   const isYoutubeVideoPageRef = useRef<boolean>(false);
@@ -68,6 +70,49 @@ export const useAudioFile = (
       return false;
     }
   }, []);
+
+  // 检查当前视频是否已被替换音频
+  const checkCurrentVideoReplaced = useCallback(async (): Promise<boolean> => {
+    if (!activeTabId) return false;
+
+    try {
+      // 发送消息到内容脚本，检查当前视频是否已被替换音频
+      return await new Promise<boolean>(resolve => {
+        const timeoutId = setTimeout(() => {
+          console.log('检查替换状态超时');
+          resolve(false);
+        }, 3000);
+
+        try {
+          chrome.tabs.sendMessage(activeTabId, { type: 'CHECK_AUDIO_REPLACED' }, response => {
+            clearTimeout(timeoutId);
+
+            if (chrome.runtime.lastError) {
+              console.log('检查替换状态失败:', chrome.runtime.lastError.message);
+              resolve(false);
+              return;
+            }
+
+            if (!response) {
+              console.log('检查替换状态未收到响应');
+              resolve(false);
+              return;
+            }
+
+            console.log('检查替换状态结果:', response.isReplaced);
+            resolve(response.isReplaced === true);
+          });
+        } catch (error) {
+          clearTimeout(timeoutId);
+          console.error('检查替换状态出错:', error);
+          resolve(false);
+        }
+      });
+    } catch (error) {
+      console.error('检查当前视频替换状态失败:', error);
+      return false;
+    }
+  }, [activeTabId]);
 
   // 处理音频文件
   const handleAudioFile = useCallback((file: File) => {
@@ -360,13 +405,28 @@ export const useAudioFile = (
 
   // 检查当前标签页并尝试加载缓存的音频
   const checkCurrentTabAndLoadCache = useCallback(async () => {
+    // 设置为未初始化状态
+    setIsInitialized(false);
+
     if (!activeTabId) {
-      // 如果没有活动标签页，也应该重置状态
+      // 如果没有活动标签页，重置所有状态
       isYoutubeVideoPageRef.current = false;
       if (isReplaced) {
         setIsReplaced(false);
       }
+      // 完全重置状态，包括音频文件和URL
+      if (audioFile || audioUrl) {
+        if (audioUrl) {
+          URL.revokeObjectURL(audioUrl);
+          previousUrlRef.current = '';
+        }
+        setAudioFile(null);
+        setAudioUrl('');
+      }
       currentVideoIdRef.current = null;
+
+      // 非YouTube页面，立即设置为已初始化状态
+      setIsInitialized(true);
       return;
     }
 
@@ -374,12 +434,24 @@ export const useAudioFile = (
       // 获取当前标签页信息
       const tab = await chrome.tabs.get(activeTabId);
       if (!tab.url) {
-        // 如果没有URL，也应该重置状态
+        // 如果没有URL，重置所有状态
         isYoutubeVideoPageRef.current = false;
         if (isReplaced) {
           setIsReplaced(false);
         }
+        // 完全重置状态，包括音频文件和URL
+        if (audioFile || audioUrl) {
+          if (audioUrl) {
+            URL.revokeObjectURL(audioUrl);
+            previousUrlRef.current = '';
+          }
+          setAudioFile(null);
+          setAudioUrl('');
+        }
         currentVideoIdRef.current = null;
+
+        // 非YouTube页面，立即设置为已初始化状态
+        setIsInitialized(true);
         return;
       }
 
@@ -388,13 +460,26 @@ export const useAudioFile = (
       isYoutubeVideoPageRef.current = isYoutubePage;
 
       if (!isYoutubePage) {
-        // 如果不是YouTube视频页面，重置状态
+        // 如果不是YouTube视频页面，重置所有状态
         if (isReplaced) {
           console.log('当前不是YouTube视频页面，重置替换状态');
-          // 不调用handleRestore，直接重置状态
           setIsReplaced(false);
         }
+        // 完全重置状态，包括音频文件和URL
+        if (audioFile || audioUrl) {
+          console.log('当前不是YouTube视频页面，重置音频文件');
+          if (audioUrl) {
+            URL.revokeObjectURL(audioUrl);
+            previousUrlRef.current = '';
+          }
+          setAudioFile(null);
+          setAudioUrl('');
+        }
         currentVideoIdRef.current = null;
+
+        // 非YouTube页面，立即设置为已初始化状态
+        console.log('非YouTube页面，立即设置为已初始化状态');
+        setIsInitialized(true);
         return;
       }
 
@@ -403,11 +488,39 @@ export const useAudioFile = (
       if (!videoId) {
         console.error('无法从URL提取视频ID:', tab.url);
         currentVideoIdRef.current = null;
+        // 重置所有状态
+        if (isReplaced) {
+          setIsReplaced(false);
+        }
+        if (audioFile || audioUrl) {
+          if (audioUrl) {
+            URL.revokeObjectURL(audioUrl);
+            previousUrlRef.current = '';
+          }
+          setAudioFile(null);
+          setAudioUrl('');
+        }
+
+        // YouTube页面但无法提取视频ID，设置为已初始化状态
+        console.log('YouTube页面但无法提取视频ID，设置为已初始化状态');
+        setIsInitialized(true);
         return;
       }
 
-      // 如果视频ID没有变化，不需要处理
+      console.log('检测到YouTube视频页面，视频ID:', videoId);
+
+      // 如果视频ID没有变化，检查替换状态并更新
       if (videoId === currentVideoIdRef.current) {
+        // 检查当前视频是否已被替换音频
+        const isCurrentlyReplaced = await checkCurrentVideoReplaced();
+        if (isCurrentlyReplaced !== isReplaced) {
+          console.log('检测到替换状态变化:', isCurrentlyReplaced);
+          setIsReplaced(isCurrentlyReplaced);
+        }
+
+        // 视频ID没有变化，设置为已初始化状态
+        console.log('视频ID没有变化，设置为已初始化状态');
+        setIsInitialized(true);
         return;
       }
 
@@ -416,9 +529,19 @@ export const useAudioFile = (
       // 更新当前视频ID
       currentVideoIdRef.current = videoId;
 
-      // 如果当前有替换的音频，先恢复原始音频
-      if (isReplaced) {
-        await handleRestore();
+      // 检查当前视频是否已被替换音频
+      const isCurrentlyReplaced = await checkCurrentVideoReplaced();
+      console.log('当前视频替换状态:', isCurrentlyReplaced);
+      setIsReplaced(isCurrentlyReplaced);
+
+      // 重置当前音频状态，为新视频准备
+      if (audioFile || audioUrl) {
+        if (audioUrl) {
+          URL.revokeObjectURL(audioUrl);
+          previousUrlRef.current = '';
+        }
+        setAudioFile(null);
+        setAudioUrl('');
       }
 
       // 尝试从缓存加载音频
@@ -439,29 +562,55 @@ export const useAudioFile = (
         setAudioUrl(newUrl);
         previousUrlRef.current = newUrl;
 
-        // 只有在连接状态正常时才自动替换音频
-        if (connectionStatus === ConnectionStatus.CONNECTED) {
+        // 只有在连接状态正常且当前未替换音频时才自动替换音频
+        if (connectionStatus === ConnectionStatus.CONNECTED && !isCurrentlyReplaced) {
           // 自动替换音频
           setIsReplacing(true);
           try {
             // 发送消息到内容脚本，传递 Base64 数据
             const response = await new Promise<{ success: boolean; error?: string }>((resolve, reject) => {
-              chrome.tabs.sendMessage(
-                activeTabId,
-                {
-                  type: 'REPLACE_YOUTUBE_AUDIO',
-                  audioData: cachedAudio.audioData,
-                  fileName: cachedAudio.fileName,
-                  fileType: cachedAudio.fileType,
-                },
-                response => {
-                  if (chrome.runtime.lastError) {
-                    reject(new Error(chrome.runtime.lastError.message || '发送消息失败'));
-                    return;
-                  }
-                  resolve(response);
-                },
-              );
+              const timeoutId = setTimeout(() => {
+                reject(new Error('替换操作超时，请刷新页面重试'));
+              }, 10000); // 10秒超时
+
+              try {
+                chrome.tabs.sendMessage(
+                  activeTabId,
+                  {
+                    type: 'REPLACE_YOUTUBE_AUDIO',
+                    audioData: cachedAudio.audioData,
+                    fileName: cachedAudio.fileName,
+                    fileType: cachedAudio.fileType,
+                  },
+                  response => {
+                    clearTimeout(timeoutId);
+
+                    if (chrome.runtime.lastError) {
+                      console.error('发送消息错误:', chrome.runtime.lastError);
+                      if (
+                        chrome.runtime.lastError.message?.includes('port closed') ||
+                        chrome.runtime.lastError.message?.includes('disconnected') ||
+                        chrome.runtime.lastError.message?.includes('Receiving end does not exist')
+                      ) {
+                        reject(new Error('与页面的连接已断开，请刷新页面后重试'));
+                      } else {
+                        reject(new Error(chrome.runtime.lastError.message || '发送消息失败'));
+                      }
+                      return;
+                    }
+
+                    if (!response) {
+                      reject(new Error('内容脚本未返回响应'));
+                      return;
+                    }
+
+                    resolve(response);
+                  },
+                );
+              } catch (error) {
+                clearTimeout(timeoutId);
+                reject(error);
+              }
             });
 
             if (!response || !response.success) {
@@ -476,20 +625,46 @@ export const useAudioFile = (
             setIsReplacing(false);
           }
         }
+
+        // 缓存加载完成，设置为已初始化状态
+        console.log('缓存加载完成，设置为已初始化状态');
+        setIsInitialized(true);
+      } else {
+        console.log('未找到缓存的音频，保持初始状态');
+        // 没有缓存，设置为已初始化状态
+        console.log('没有缓存，设置为已初始化状态');
+        setIsInitialized(true);
       }
     } catch (error) {
       console.error('检查当前标签页并加载缓存失败:', error);
+      // 即使出错也设置为已初始化状态
+      console.log('出错，设置为已初始化状态');
+      setIsInitialized(true);
     }
-  }, [activeTabId, connectionStatus, extractVideoId, isReplaced, handleRestore, isYoutubeVideoPage]);
+  }, [
+    activeTabId,
+    connectionStatus,
+    extractVideoId,
+    isReplaced,
+    isYoutubeVideoPage,
+    audioFile,
+    audioUrl,
+    checkCurrentVideoReplaced,
+  ]);
 
   // 监听标签页变化，自动加载缓存
   useEffect(() => {
+    // 每次标签页变化时，先设置为未初始化状态
+    setIsInitialized(false);
+
     // 初始检查
     checkCurrentTabAndLoadCache();
 
     // 监听标签页变化
     const handleTabChange = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo) => {
       if (changeInfo.url && tabId === activeTabId) {
+        // 标签页URL变化时，先设置为未初始化状态
+        setIsInitialized(false);
         checkCurrentTabAndLoadCache();
       }
     };
@@ -503,16 +678,25 @@ export const useAudioFile = (
 
   // 监听连接状态变化
   useEffect(() => {
-    // 当连接状态变化时，重新检查当前标签页
+    // 当连接状态变化时，先设置为未初始化状态
+    setIsInitialized(false);
+
+    // 重新检查当前标签页
     checkCurrentTabAndLoadCache();
   }, [connectionStatus, checkCurrentTabAndLoadCache]);
 
-  // 添加消息监听器，处理视频加载状态
+  // 添加消息监听器，处理视频加载状态和页面变化
   useEffect(() => {
-    const handleMessage = (message: { type: string; isLoading?: boolean }) => {
+    const handleMessage = (message: { type: string; isLoading?: boolean; isYoutubePage?: boolean; url?: string }) => {
       if (message.type === 'VIDEO_LOADING_STATE' && typeof message.isLoading === 'boolean') {
         console.log('收到视频加载状态更新:', message.isLoading);
         setIsVideoLoading(message.isLoading);
+      } else if (message.type === 'PAGE_CHANGE') {
+        console.log('收到页面变化通知:', message.isYoutubePage ? 'YouTube页面' : '非YouTube页面', message.url);
+        // 页面变化时，先设置为未初始化状态
+        setIsInitialized(false);
+        // 触发重新检查当前标签页和缓存
+        checkCurrentTabAndLoadCache();
       }
     };
 
@@ -523,7 +707,7 @@ export const useAudioFile = (
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage);
     };
-  }, []);
+  }, [checkCurrentTabAndLoadCache]);
 
   return {
     audioFile,
@@ -531,6 +715,7 @@ export const useAudioFile = (
     isReplacing,
     isReplaced,
     isVideoLoading,
+    isInitialized,
     handleAudioFile,
     handleFileChange,
     handleReplace,
