@@ -394,14 +394,47 @@ export const useAudioFile = (
   }, [connectionStatus, activeTabId, checkConnectionStatus]);
 
   const handleDelete = useCallback(() => {
+    // 如果当前音频已替换视频音频，先恢复原始音频
+    if (isReplaced && activeTabId) {
+      // 发送消息到内容脚本，请求恢复原始音频
+      chrome.tabs.sendMessage(
+        activeTabId,
+        {
+          type: 'RESTORE_YOUTUBE_AUDIO',
+        },
+        response => {
+          if (chrome.runtime.lastError) {
+            console.error('发送恢复音频消息错误:', chrome.runtime.lastError);
+            // 即使出错也继续删除本地音频文件
+          }
+          console.log('恢复原音频响应:', response);
+        },
+      );
+    }
+
+    // 删除本地音频文件
     if (audioUrl) {
       URL.revokeObjectURL(audioUrl);
       previousUrlRef.current = '';
     }
+
+    // 重置状态
     setAudioFile(null);
     setAudioUrl('');
     setIsReplaced(false);
-  }, [audioUrl]);
+
+    // 如果有视频ID，尝试删除缓存
+    if (currentVideoIdRef.current) {
+      try {
+        audioCacheDB
+          .deleteAudioCache(currentVideoIdRef.current)
+          .then(() => console.log('已删除音频缓存:', currentVideoIdRef.current))
+          .catch(err => console.error('删除音频缓存失败:', err));
+      } catch (error) {
+        console.error('删除音频缓存时出错:', error);
+      }
+    }
+  }, [audioUrl, isReplaced, activeTabId, currentVideoIdRef]);
 
   // 检查当前标签页并尝试加载缓存的音频
   const checkCurrentTabAndLoadCache = useCallback(async () => {
