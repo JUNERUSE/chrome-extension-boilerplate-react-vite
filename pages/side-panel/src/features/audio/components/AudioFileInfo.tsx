@@ -53,6 +53,7 @@ const AudioFileInfo: FC<AudioFileInfoProps> = ({
     return (
       <Button
         color={isReplaced ? 'default' : 'primary'}
+        variant={isReplaced ? 'flat' : 'solid'}
         isLoading={isReplacing}
         onPress={isReplaced ? onRestore : onReplace}
         className="w-full"
