@@ -48,12 +48,16 @@ const manifest = {
   },
   content_scripts: [
     {
-      matches: ['http://*/*', 'https://*/*', '<all_urls>'],
+      matches: ['*://*.youtube.com/*'],
       js: ['content/index.iife.js'],
+      all_frames: false,
+      run_at: 'document_idle',
+      world: 'MAIN',
     },
     {
       matches: ['http://*/*', 'https://*/*', '<all_urls>'],
       js: ['content-ui/index.iife.js'],
+      world: 'ISOLATED',
     },
     {
       matches: ['http://*/*', 'https://*/*', '<all_urls>'],

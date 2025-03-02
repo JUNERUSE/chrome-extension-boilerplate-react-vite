@@ -2,6 +2,51 @@ import './features/audio-replacer';
 
 import { sampleFunction } from '@src/sampleFunction';
 
+// 添加更多调试信息，确保脚本正确加载
+console.log('内容脚本开始加载 - ' + new Date().toISOString());
+
+// 确保内容脚本在页面加载时正确初始化
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOMContentLoaded事件触发 - 内容脚本已初始化');
+});
+
+// 在window.onload事件中再次确认脚本已加载
+window.addEventListener('load', () => {
+  console.log('Window.onload事件触发 - 页面完全加载');
+
+  // 检查 chrome API 是否可用
+  if (typeof chrome !== 'undefined' && chrome.runtime) {
+    // 主动发送消息到后台脚本，确认内容脚本已加载
+    chrome.runtime
+      .sendMessage({ type: 'CONTENT_SCRIPT_LOADED' })
+      .then(response => console.log('收到后台脚本响应:', response))
+      .catch(error => console.error('发送消息到后台脚本失败:', error));
+
+    // 添加全局错误处理，捕获未处理的runtime.lastError
+    // 不覆盖原始方法，而是添加全局错误处理器
+    window.addEventListener('unhandledrejection', event => {
+      if (
+        event.reason &&
+        typeof event.reason.message === 'string' &&
+        event.reason.message.includes('message port closed')
+      ) {
+        console.warn('捕获到未处理的消息端口关闭错误:', event.reason);
+        event.preventDefault();
+      }
+    });
+
+    // 添加全局错误处理，捕获未处理的runtime.lastError
+    window.addEventListener('error', event => {
+      if (event.error && event.error.message && event.error.message.includes('message port closed')) {
+        console.warn('捕获到消息端口关闭错误，这通常是因为页面刷新或导航');
+        event.preventDefault();
+      }
+    });
+  } else {
+    console.warn('chrome.runtime API 不可用，可能是因为内容脚本运行在 MAIN 世界中');
+  }
+});
+
 console.log('content script loaded');
 
 // Shows how to call a function defined in another module
@@ -71,15 +116,21 @@ if (window.location.href.includes('youtube.com/watch')) {
         event.stopPropagation();
         console.log('字幕按钮被点击');
 
-        // 触发扩展图标点击效果
-        chrome.runtime
-          .sendMessage({
-            type: 'TRIGGER_BADGE_CLICK',
-            url: window.location.href,
-          })
-          .catch(() => {
-            showYouTubeStyleToast('正在打开字幕查看器...');
-          });
+        // 检查 chrome API 是否可用
+        if (typeof chrome !== 'undefined' && chrome.runtime) {
+          // 触发扩展图标点击效果
+          chrome.runtime
+            .sendMessage({
+              type: 'TRIGGER_BADGE_CLICK',
+              url: window.location.href,
+            })
+            .catch(() => {
+              showYouTubeStyleToast('正在打开字幕查看器...');
+            });
+        } else {
+          console.warn('chrome.runtime API 不可用，无法发送消息');
+          showYouTubeStyleToast('正在打开字幕查看器...');
+        }
       });
 
       // 添加到播放器控制栏
