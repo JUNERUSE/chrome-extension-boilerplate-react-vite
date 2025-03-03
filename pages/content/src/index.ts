@@ -54,9 +54,34 @@ sampleFunction();
 
 // YouTube视频页面按钮添加功能
 if (window.location.href.includes('youtube.com/watch')) {
-  console.log('YouTube视频页面检测到，准备添加字幕按钮');
+  console.log('YouTube视频页面检测到，准备添加扩展按钮');
 
-  // 使用setInterval持续检查并尝试添加按钮
+  // 使用MutationObserver监听DOM变化，确保在播放器控制栏加载后添加按钮
+  const observer = new MutationObserver(() => {
+    const controlsSelector = '.ytp-right-controls';
+    const playerControls = document.querySelector(controlsSelector);
+
+    if (playerControls) {
+      // 如果按钮已存在，不再添加
+      if (document.querySelector('.ytp-extension-button')) {
+        console.log('扩展按钮已存在，不再添加');
+        return;
+      }
+
+      console.log('找到播放器控制栏，尝试添加扩展按钮');
+      addExtensionButton(playerControls);
+
+      // 不断开观察器，因为YouTube是SPA，页面可能会重新加载控制栏
+    }
+  });
+
+  // 开始观察整个文档
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+
+  // 同时使用定时器作为备份方案
   const buttonAddedInterval = setInterval(() => {
     const controlsSelector = '.ytp-right-controls';
     const playerControls = document.querySelector(controlsSelector);
@@ -67,99 +92,120 @@ if (window.location.href.includes('youtube.com/watch')) {
     }
 
     // 如果按钮已存在，停止间隔
-    if (document.querySelector('.ytp-subtitle-button')) {
-      console.log('字幕按钮已存在，停止检查');
+    if (document.querySelector('.ytp-extension-button')) {
+      console.log('扩展按钮已存在，停止检查');
       clearInterval(buttonAddedInterval);
       return;
     }
 
-    console.log('找到播放器控制栏，尝试添加字幕按钮');
-
-    try {
-      // 创建字幕按钮
-      const subtitleButton = document.createElement('button');
-      subtitleButton.className = 'ytp-button ytp-subtitle-button';
-      subtitleButton.setAttribute('aria-label', '获取字幕');
-      subtitleButton.title = '获取字幕';
-
-      // 调整样式以匹配YouTube原生按钮
-      subtitleButton.style.backgroundColor = 'transparent';
-      subtitleButton.style.color = 'inherit';
-      subtitleButton.style.border = 'none';
-      subtitleButton.style.padding = '0';
-      subtitleButton.style.cursor = 'pointer';
-
-      // 使用SVG图标，与YouTube风格一致
-      subtitleButton.innerHTML = `
-        <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%">
-          <path d="M11,11 L25,11 L25,13 L11,13 Z M14,15 L22,15 L22,17 L14,17 Z M11,19 L25,19 L25,21 L11,21 Z M14,23 L22,23 L22,25 L14,25 Z" fill="white"></path>
-        </svg>
-      `;
-
-      // 添加悬停效果
-      subtitleButton.addEventListener('mouseenter', () => {
-        const path = subtitleButton.querySelector('path');
-        if (path) {
-          path.setAttribute('fill', '#ff0000');
-        }
-      });
-
-      subtitleButton.addEventListener('mouseleave', () => {
-        const path = subtitleButton.querySelector('path');
-        if (path) {
-          path.setAttribute('fill', 'white');
-        }
-      });
-
-      // 添加点击事件
-      subtitleButton.addEventListener('click', event => {
-        event.stopPropagation();
-        console.log('字幕按钮被点击');
-
-        // 检查 chrome API 是否可用
-        if (typeof chrome !== 'undefined' && chrome.runtime) {
-          // 触发扩展图标点击效果
-          chrome.runtime
-            .sendMessage({
-              type: 'TRIGGER_BADGE_CLICK',
-              url: window.location.href,
-            })
-            .catch(() => {
-              showYouTubeStyleToast('正在打开字幕查看器...');
-            });
-        } else {
-          console.warn('chrome.runtime API 不可用，无法发送消息');
-          showYouTubeStyleToast('正在打开字幕查看器...');
-        }
-      });
-
-      // 添加到播放器控制栏
-      const miniplayerButton = playerControls.querySelector('.ytp-miniplayer-button');
-      const fullscreenButton = playerControls.querySelector('.ytp-fullscreen-button');
-
-      if (miniplayerButton) {
-        playerControls.insertBefore(subtitleButton, miniplayerButton);
-      } else if (fullscreenButton) {
-        playerControls.insertBefore(subtitleButton, fullscreenButton);
-      } else {
-        playerControls.appendChild(subtitleButton);
-      }
-      console.log('字幕按钮已成功添加');
-
-      // 按钮添加成功，清除间隔
-      clearInterval(buttonAddedInterval);
-    } catch (error) {
-      console.error('添加按钮时出错:', error);
-    }
+    console.log('通过定时器找到播放器控制栏，尝试添加扩展按钮');
+    addExtensionButton(playerControls);
+    clearInterval(buttonAddedInterval);
   }, 1000); // 每秒检查一次
 
-  // 60秒后停止尝试添加按钮，防止无限循环
-  setTimeout(() => {
-    if (buttonAddedInterval) {
-      clearInterval(buttonAddedInterval);
-      console.log('停止尝试添加字幕按钮');
+  // 在页面加载完成后也尝试添加按钮
+  window.addEventListener('load', () => {
+    const controlsSelector = '.ytp-right-controls';
+    const playerControls = document.querySelector(controlsSelector);
+
+    if (playerControls && !document.querySelector('.ytp-extension-button')) {
+      console.log('页面加载完成，尝试添加扩展按钮');
+      addExtensionButton(playerControls);
     }
-  }, 60000);
+  });
+
+  // 监听YouTube的导航事件（因为YouTube是SPA）
+  window.addEventListener('yt-navigate-finish', () => {
+    if (window.location.href.includes('youtube.com/watch')) {
+      const controlsSelector = '.ytp-right-controls';
+      const playerControls = document.querySelector(controlsSelector);
+
+      if (playerControls && !document.querySelector('.ytp-extension-button')) {
+        console.log('YouTube导航完成，尝试添加扩展按钮');
+        addExtensionButton(playerControls);
+      }
+    }
+  });
+}
+
+// 添加扩展按钮的函数
+function addExtensionButton(playerControls: Element) {
+  try {
+    // 创建扩展按钮
+    const extensionButton = document.createElement('button');
+    extensionButton.className = 'ytp-button ytp-extension-button';
+    extensionButton.setAttribute('aria-label', '打开扩展');
+    extensionButton.title = '打开扩展';
+
+    // 调整样式以匹配YouTube原生按钮
+    extensionButton.style.backgroundColor = 'transparent';
+    extensionButton.style.color = 'inherit';
+    extensionButton.style.border = 'none';
+    extensionButton.style.padding = '0';
+    extensionButton.style.cursor = 'pointer';
+
+    // 使用SVG图标，与YouTube风格一致
+    extensionButton.innerHTML = `
+      <svg height="100%" version="1.1" viewBox="0 0 36 36" width="100%">
+          <path d="M11,11 L25,11 L25,13 L11,13 Z M14,15 L22,15 L22,17 L14,17 Z M11,19 L25,19 L25,21 L11,21 Z M14,23 L22,23 L22,25 L14,25 Z" fill="white"></path>
+      </svg>
+    `;
+
+    // 添加悬停效果
+    extensionButton.addEventListener('mouseenter', () => {
+      const path = extensionButton.querySelector('path');
+      if (path) {
+        path.setAttribute('fill', '#ff0000');
+      }
+    });
+
+    extensionButton.addEventListener('mouseleave', () => {
+      const path = extensionButton.querySelector('path');
+      if (path) {
+        path.setAttribute('fill', 'white');
+      }
+    });
+
+    // 添加点击事件
+    extensionButton.addEventListener('click', event => {
+      event.stopPropagation();
+      console.log('扩展按钮被点击');
+
+      // 检查 chrome API 是否可用
+      if (typeof chrome !== 'undefined' && chrome.runtime) {
+        // 打开扩展的popup
+        chrome.runtime
+          .sendMessage({
+            type: 'OPEN_POPUP',
+            url: window.location.href,
+          })
+          .catch(() => {
+            showYouTubeStyleToast('正在打开扩展...');
+          });
+      } else {
+        console.warn('chrome.runtime API 不可用，无法发送消息');
+        showYouTubeStyleToast('正在打开扩展...');
+      }
+    });
+
+    // 添加到播放器控制栏
+    const miniplayerButton = playerControls.querySelector('.ytp-miniplayer-button');
+    const fullscreenButton = playerControls.querySelector('.ytp-fullscreen-button');
+
+    if (miniplayerButton) {
+      playerControls.insertBefore(extensionButton, miniplayerButton);
+    } else if (fullscreenButton) {
+      playerControls.insertBefore(extensionButton, fullscreenButton);
+    } else {
+      playerControls.appendChild(extensionButton);
+    }
+    console.log('扩展按钮已成功添加');
+
+    return true;
+  } catch (error) {
+    console.error('添加扩展按钮时出错:', error);
+    return false;
+  }
 }
 
 // 显示YouTube风格的提示toast

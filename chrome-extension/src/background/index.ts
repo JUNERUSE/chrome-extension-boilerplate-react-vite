@@ -58,6 +58,14 @@ chrome.runtime.onMessage.addListener((message, sender) => {
           console.log('侧边栏可能尚未准备好接收消息');
         });
     }
+  } else if (message.type === 'OPEN_POPUP' && sender.tab) {
+    // 打开popup
+    chrome.action.openPopup();
+    // 清除图标提示
+    chrome.action.setBadgeText({
+      text: '',
+      tabId: sender.tab.id,
+    });
   }
 });
 

@@ -51,8 +51,8 @@ const manifest = {
       matches: ['*://*.youtube.com/*'],
       js: ['content/index.iife.js'],
       all_frames: false,
-      run_at: 'document_idle',
-      world: 'MAIN',
+      run_at: 'document_end',
+      world: 'ISOLATED',
     },
     {
       matches: ['http://*/*', 'https://*/*', '<all_urls>'],

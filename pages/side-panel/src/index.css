@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  min-width: 400px;
+  min-width: 350px;
   min-height: 100vh;
   @apply bg-background text-foreground;
 }

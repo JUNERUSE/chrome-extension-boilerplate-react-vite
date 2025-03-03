@@ -43,13 +43,17 @@ const Audio = () => {
   useEffect(() => {
     // 如果不是YouTube页面（连接状态为DISCONNECTED），不显示加载状态
     if (connectionStatus === ConnectionStatus.DISCONNECTED) {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 200);
       return;
     }
 
     // 如果是YouTube页面，等待初始化完成
     if (isInitialized) {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 200);
     } else {
       setIsLoading(true);
     }

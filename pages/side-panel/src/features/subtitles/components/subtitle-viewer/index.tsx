@@ -383,6 +383,7 @@ const SubtitleViewer = forwardRef<SubtitleViewerRef, SubtitleViewerProps>(({ vid
               <Button
                 onPress={toggleMultiLanguageMode}
                 disabled={loading || availableLanguages.length <= 1}
+                color={isMultiLanguageMode ? 'primary' : 'default'}
                 variant={isMultiLanguageMode ? 'solid' : 'flat'}
                 fullWidth>
                 {isMultiLanguageMode ? '单语言模式' : '多语言模式'}
