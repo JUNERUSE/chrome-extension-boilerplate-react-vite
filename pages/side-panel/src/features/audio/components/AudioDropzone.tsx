@@ -2,9 +2,10 @@ import { cn } from '@extension/ui';
 import { Button } from '@heroui/button';
 import { IconCloudUpload } from '@tabler/icons-react';
 import { type AnimationControls, motion } from 'framer-motion';
-import type { FC } from 'react';
+import { type FC, useState } from 'react';
 
 import { ConnectionStatus } from '../hooks';
+import AudioFromSubitles from './AudioFromSubitles';
 
 interface AudioDropzoneProps {
   isDragging: boolean;
@@ -13,6 +14,7 @@ interface AudioDropzoneProps {
   handleDragEnter: (e: React.DragEvent) => void;
   handleDragLeave: (e: React.DragEvent) => void;
   handleDrop: (e: React.DragEvent) => void;
+  onAudioFile: (file: File) => void;
   onFileSelect: () => void;
   disabled?: boolean;
 }
@@ -25,8 +27,13 @@ const AudioDropzone: FC<AudioDropzoneProps> = ({
   handleDragLeave,
   handleDrop,
   onFileSelect,
+  onAudioFile,
   disabled = false,
 }) => {
+  const [isInternalDisabled, setIsInternalDisabled] = useState(disabled);
+
+  const isDisabled = disabled || isInternalDisabled;
+
   return (
     <div className="relative h-[320px]">
       <motion.div
@@ -34,20 +41,20 @@ const AudioDropzone: FC<AudioDropzoneProps> = ({
         className={cn(
           'absolute inset-0 rounded-xl transition-all duration-200 border-2 border-dashed',
           isDragging ? 'border-blue-400 bg-blue-50/50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700',
-          disabled && 'opacity-60 cursor-not-allowed',
+          isDisabled && 'opacity-60 cursor-not-allowed',
         )}
-        onDragEnter={disabled ? undefined : handleDragEnter}
+        onDragEnter={isDisabled ? undefined : handleDragEnter}
         onDragOver={e => {
           e.preventDefault();
           e.stopPropagation();
         }}
-        onDragLeave={disabled ? undefined : handleDragLeave}
-        onDrop={disabled ? undefined : handleDrop}>
+        onDragLeave={isDisabled ? undefined : handleDragLeave}
+        onDrop={isDisabled ? undefined : handleDrop}>
         <label
           htmlFor="audio-upload"
           className={cn(
             'absolute inset-0 flex flex-col items-center justify-center',
-            disabled ? 'cursor-not-allowed' : 'cursor-pointer',
+            isDisabled ? 'cursor-not-allowed' : 'cursor-pointer',
           )}>
           <input
             id="audio-upload"
@@ -55,7 +62,7 @@ const AudioDropzone: FC<AudioDropzoneProps> = ({
             accept="audio/*"
             className="hidden"
             aria-label="选择音频文件"
-            disabled={disabled}
+            disabled={isDisabled}
           />
           <div className="flex flex-col items-center gap-4">
             <Button
@@ -65,12 +72,19 @@ const AudioDropzone: FC<AudioDropzoneProps> = ({
               variant="shadow"
               radius="full"
               onPress={onFileSelect}
-              isDisabled={disabled}>
+              isDisabled={isDisabled}>
               <IconCloudUpload className="w-6 h-6" stroke={1.5} />
             </Button>
             <div className="text-center">
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">点击选择或浏览文件</p>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">或将文件拖放到此处</p>
+
+              {/* 从字幕生成音频 */}
+              <AudioFromSubitles
+                disabled={isDisabled}
+                setIsDisabled={setIsInternalDisabled}
+                onAudioFile={onAudioFile}
+              />
+
               {connectionStatus === ConnectionStatus.DISCONNECTED && (
                 <p className="mt-2 text-xs text-red-500">请先打开 YouTube 视频页面</p>
               )}

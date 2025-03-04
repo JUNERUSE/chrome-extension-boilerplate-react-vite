@@ -1,3 +1,5 @@
+import { extractVideoId, isYoutubeVideoPage } from '@src/features/common';
+import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { audioCacheDB, type AudioCacheItem } from '../utils/db';
@@ -15,6 +17,7 @@ export interface AudioFileState {
   handleReplace: () => Promise<void>;
   handleRestore: () => Promise<void>;
   handleDelete: () => void;
+  currentVideoIdRef: RefObject<string | null>;
 }
 
 export const useAudioFile = (
@@ -39,36 +42,6 @@ export const useAudioFile = (
         URL.revokeObjectURL(previousUrlRef.current);
       }
     };
-  }, []);
-
-  // 从URL中提取视频ID
-  const extractVideoId = useCallback((url: string): string | null => {
-    try {
-      const urlObj = new URL(url);
-      if (urlObj.hostname.includes('youtube.com')) {
-        return urlObj.searchParams.get('v');
-      } else if (urlObj.hostname.includes('youtu.be')) {
-        return urlObj.pathname.substring(1);
-      }
-      return null;
-    } catch (error) {
-      console.error('解析URL失败:', error);
-      return null;
-    }
-  }, []);
-
-  // 检查是否是YouTube视频页面
-  const isYoutubeVideoPage = useCallback((url: string): boolean => {
-    try {
-      const urlObj = new URL(url);
-      return (
-        (urlObj.hostname.includes('youtube.com') && urlObj.pathname.includes('/watch')) ||
-        urlObj.hostname.includes('youtu.be')
-      );
-    } catch (error) {
-      console.error('解析URL失败:', error);
-      return false;
-    }
   }, []);
 
   // 检查当前视频是否已被替换音频
@@ -674,16 +647,7 @@ export const useAudioFile = (
       console.log('出错，设置为已初始化状态');
       setIsInitialized(true);
     }
-  }, [
-    activeTabId,
-    connectionStatus,
-    extractVideoId,
-    isReplaced,
-    isYoutubeVideoPage,
-    audioFile,
-    audioUrl,
-    checkCurrentVideoReplaced,
-  ]);
+  }, [activeTabId, connectionStatus, isReplaced, audioFile, audioUrl, checkCurrentVideoReplaced]);
 
   // 监听标签页变化，自动加载缓存
   useEffect(() => {
@@ -754,5 +718,6 @@ export const useAudioFile = (
     handleReplace,
     handleRestore,
     handleDelete,
+    currentVideoIdRef,
   };
 };

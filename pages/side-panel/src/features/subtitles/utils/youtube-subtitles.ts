@@ -235,7 +235,7 @@ export const getAvailableSubtitleLanguages = async (videoId: string): Promise<Ca
 };
 
 // 获取YouTube视频字幕
-export const getYouTubeSubtitles = async (videoId: string, lang = 'zh-CN'): Promise<SubtitleData | null> => {
+export const getYouTubeSubtitles = async (videoId: string, lang = 'zh-Hans'): Promise<SubtitleData | null> => {
   try {
     // 获取所有可用的字幕轨道
     const captionTracks = await getAvailableSubtitleLanguages(videoId);
@@ -353,7 +353,7 @@ export const getYouTubeSubtitles = async (videoId: string, lang = 'zh-CN'): Prom
 // 获取多语言字幕
 export const getMultiLanguageSubtitles = async (
   videoId: string,
-  languages: string[] = ['en', 'zh-CN'],
+  languages: string[] = ['en', 'zh-Hans'],
 ): Promise<Record<string, SubtitleData | null>> => {
   try {
     // 获取所有可用的字幕轨道

@@ -2,7 +2,7 @@ import { Button } from '@heroui/button';
 import { Form } from '@heroui/form';
 import { Textarea } from '@heroui/input';
 import { Select, SelectItem } from '@heroui/select';
-import AudioPlayer from '@src/features/audio/components';
+import AudioPlayer from '@src/features/audio/components/AudioPlayer';
 import { DEFAULT_VOICE_SETTINGS } from '@src/features/tts/constants';
 import { audioQualityOptions, languageOptions, speedOptions } from '@src/features/tts/constants/options';
 import type { TTSResponse, VoiceRSSParams } from '@src/features/tts/types';

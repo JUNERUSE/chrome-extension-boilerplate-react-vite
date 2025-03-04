@@ -1,16 +1,16 @@
 import type { AudioQuality, Language, Speed } from '../types';
 
-// 语音语言选项
+// 语音语言选项（目前 api 只支持 en-us）
 export const languageOptions: { key: Language; label: string }[] = [
-  { key: 'zh-cn', label: '中文 (中国)' },
-  { key: 'zh-tw', label: '中文 (台湾)' },
+  // { key: 'zh-cn', label: '中文 (中国)' },
+  // { key: 'zh-tw', label: '中文 (台湾)' },
   { key: 'en-us', label: '英语 (美国)' },
-  { key: 'en-gb', label: '英语 (英国)' },
-  { key: 'ja-jp', label: '日语' },
-  { key: 'ko-kr', label: '韩语' },
-  { key: 'fr-fr', label: '法语' },
-  { key: 'de-de', label: '德语' },
-  { key: 'ru-ru', label: '俄语' },
+  // { key: 'en-gb', label: '英语 (英国)' },
+  // { key: 'ja-jp', label: '日语' },
+  // { key: 'ko-kr', label: '韩语' },
+  // { key: 'fr-fr', label: '法语' },
+  // { key: 'de-de', label: '德语' },
+  // { key: 'ru-ru', label: '俄语' },
 ];
 
 // 语速选项

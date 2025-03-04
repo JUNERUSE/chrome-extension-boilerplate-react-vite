@@ -108,6 +108,7 @@ const Audio = () => {
         handleDrop={handleDrop}
         onFileSelect={handleFileSelectClick}
         disabled={isDisabled}
+        onAudioFile={handleAudioFile}
       />
     );
   };
