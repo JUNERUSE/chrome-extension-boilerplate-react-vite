@@ -1,5 +1,7 @@
 import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Spinner } from '@heroui/spinner';
+import { Tab, Tabs } from '@heroui/tabs';
+import AudioFromSubitles from '@src/features/audio/components/AudioFromSubitles';
 import { useCallback, useEffect, useState } from 'react';
 
 import AudioDropzone from '../../features/audio/components/AudioDropzone';
@@ -10,6 +12,8 @@ import { ConnectionStatus, useAudioFile, useConnectionStatus, useDragAndDrop } f
 const Audio = () => {
   // 添加加载状态
   const [isLoading, setIsLoading] = useState(true);
+
+  const [tabKey, setTabKey] = useState<'upload' | 'from-subtitles'>('upload');
 
   // 使用连接状态钩子
   const { connectionStatus, activeTabId, checkConnectionStatus, handleRefreshConnection } = useConnectionStatus();
@@ -99,17 +103,27 @@ const Audio = () => {
 
     // 默认显示音频上传区域
     return (
-      <AudioDropzone
-        isDragging={isDragging}
-        controls={controls}
-        connectionStatus={connectionStatus}
-        handleDragEnter={handleDragEnter}
-        handleDragLeave={handleDragLeave}
-        handleDrop={handleDrop}
-        onFileSelect={handleFileSelectClick}
-        disabled={isDisabled}
-        onAudioFile={handleAudioFile}
-      />
+      <Tabs
+        selectedKey={tabKey}
+        onSelectionChange={key => setTabKey(key as 'upload' | 'from-subtitles')}
+        isDisabled={isDisabled}
+        classNames={{ panel: 'p-0' }}>
+        <Tab key="upload" title="上传音频">
+          <AudioDropzone
+            isDragging={isDragging}
+            controls={controls}
+            connectionStatus={connectionStatus}
+            handleDragEnter={handleDragEnter}
+            handleDragLeave={handleDragLeave}
+            handleDrop={handleDrop}
+            onFileSelect={handleFileSelectClick}
+            disabled={isDisabled}
+          />
+        </Tab>
+        <Tab key="from-subtitles" title="从字幕生成音频">
+          <AudioFromSubitles disabled={isDisabled} setIsDisabled={setIsLoading} onAudioFile={handleAudioFile} />
+        </Tab>
+      </Tabs>
     );
   };
 

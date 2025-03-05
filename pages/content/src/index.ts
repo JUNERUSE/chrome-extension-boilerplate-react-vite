@@ -1,4 +1,5 @@
 import './features/audio-replacer';
+import './features/video-progress';
 
 import { sampleFunction } from '@src/sampleFunction';
 

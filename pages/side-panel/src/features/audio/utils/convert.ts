@@ -1,4 +1,4 @@
-import type { SubtitleItem } from '@src/features/subtitles/utils/db';
+import type { SubtitleItem } from '@extension/shared';
 
 /**
  * 将字幕条目转换为音频条目

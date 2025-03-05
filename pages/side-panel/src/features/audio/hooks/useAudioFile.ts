@@ -1,8 +1,8 @@
-import { extractVideoId, isYoutubeVideoPage } from '@src/features/common';
+import type { AudioCacheItem } from '@extension/shared';
+import { audioCacheDB, extractVideoId, isYoutubeVideoPage } from '@extension/shared';
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { audioCacheDB, type AudioCacheItem } from '../utils/db';
 import { ConnectionStatus } from './useConnectionStatus';
 
 export interface AudioFileState {

@@ -34,7 +34,6 @@ const manifest = {
   options_page: 'options/index.html',
   background: {
     service_worker: 'background.js',
-    type: 'module',
   },
   action: {
     default_popup: 'side-panel/index.html',

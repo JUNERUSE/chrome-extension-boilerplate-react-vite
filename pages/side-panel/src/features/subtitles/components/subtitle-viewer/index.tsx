@@ -1,3 +1,11 @@
+import type { CaptionTrack, SubtitleData, SubtitleItem } from '@extension/shared';
+import {
+  getAvailableSubtitleLanguages,
+  getMultiLanguageSubtitles,
+  getYouTubeSubtitles,
+  getYouTubeVideoId,
+  subtitleDB,
+} from '@extension/shared';
 import { Alert } from '@heroui/alert';
 import { Button } from '@heroui/button';
 import { Card, CardBody, CardHeader } from '@heroui/card';
@@ -7,16 +15,6 @@ import { Select, SelectItem } from '@heroui/select';
 import { IconArrowUp } from '@tabler/icons-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useState } from 'react';
-
-import type { SubtitleData, SubtitleItem } from '../../utils/db';
-import { subtitleDB } from '../../utils/db';
-import type { CaptionTrack } from '../../utils/youtube-subtitles';
-import {
-  getAvailableSubtitleLanguages,
-  getMultiLanguageSubtitles,
-  getYouTubeSubtitles,
-  getYouTubeVideoId,
-} from '../../utils/youtube-subtitles';
 
 interface SubtitleViewerProps {
   videoUrl?: string;

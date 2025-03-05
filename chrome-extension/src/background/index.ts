@@ -3,6 +3,11 @@ import 'webextension-polyfill';
 import { OPEN_POPUP_CONTEXT_MENU_ID, OPEN_SIDE_PANEL_CONTEXT_MENU_ID } from '@extension/shared';
 
 import { initBackground } from './init';
+import {
+  disableVideoProgressMonitoring,
+  enableVideoProgressMonitoring,
+  toggleVideoProgressMonitoring,
+} from './init/video-progress';
 
 // 初始化
 initBackground();
@@ -21,6 +26,25 @@ chrome.runtime.onInstalled.addListener(() => {
     title: 'Open popup',
     contexts: ['all'],
   });
+
+  // 创建视频进度监听控制的右键菜单
+  chrome.contextMenus.create({
+    id: 'TOGGLE_VIDEO_PROGRESS_MONITORING',
+    title: '切换视频进度监听',
+    contexts: ['all'],
+  });
+
+  chrome.contextMenus.create({
+    id: 'ENABLE_VIDEO_PROGRESS_MONITORING',
+    title: '开启视频进度监听',
+    contexts: ['all'],
+  });
+
+  chrome.contextMenus.create({
+    id: 'DISABLE_VIDEO_PROGRESS_MONITORING',
+    title: '关闭视频进度监听',
+    contexts: ['all'],
+  });
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
@@ -29,6 +53,15 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   } else if (info.menuItemId === OPEN_POPUP_CONTEXT_MENU_ID && tab?.id) {
     // 打开popup
     chrome.action.openPopup();
+  } else if (info.menuItemId === 'TOGGLE_VIDEO_PROGRESS_MONITORING') {
+    // 切换视频进度监听
+    toggleVideoProgressMonitoring();
+  } else if (info.menuItemId === 'ENABLE_VIDEO_PROGRESS_MONITORING') {
+    // 开启视频进度监听
+    enableVideoProgressMonitoring();
+  } else if (info.menuItemId === 'DISABLE_VIDEO_PROGRESS_MONITORING') {
+    // 关闭视频进度监听
+    disableVideoProgressMonitoring();
   }
 });
 
@@ -66,6 +99,15 @@ chrome.runtime.onMessage.addListener((message, sender) => {
       text: '',
       tabId: sender.tab.id,
     });
+  } else if (message.type === 'TOGGLE_VIDEO_PROGRESS_MONITORING') {
+    // 切换视频进度监听
+    toggleVideoProgressMonitoring();
+  } else if (message.type === 'ENABLE_VIDEO_PROGRESS_MONITORING') {
+    // 开启视频进度监听
+    enableVideoProgressMonitoring();
+  } else if (message.type === 'DISABLE_VIDEO_PROGRESS_MONITORING') {
+    // 关闭视频进度监听
+    disableVideoProgressMonitoring();
   }
 });
 

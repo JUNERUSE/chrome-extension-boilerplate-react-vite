@@ -1,3 +1,4 @@
+import { subtitleDB } from '@extension/shared';
 import { Button } from '@heroui/button';
 import { Card, CardBody, CardFooter, CardHeader } from '@heroui/card';
 import { Form } from '@heroui/form';
@@ -6,7 +7,6 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import SubtitleViewer, { type SubtitleViewerRef } from '../../features/subtitles/components/subtitle-viewer';
-import { subtitleDB } from '../../features/subtitles/utils/db';
 
 // 定义tab更新事件的changeInfo类型
 interface TabChangeInfo {
